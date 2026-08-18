@@ -19,6 +19,7 @@
 
 const overlay = document.getElementById("birthday-overlay");
 const closeButton = document.getElementById("birthday-close");
+const card = document.querySelector(".birthday-card");
 
 /** Adds the "is-open" class, which triggers the CSS fade + pop-in transition. */
 function openBirthdayMessage() {
@@ -54,6 +55,46 @@ overlay.addEventListener("click", function (event) {
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     closeBirthdayMessage();
+  }
+});
+
+/* FOCUS TRAP
+   -----------
+   Without this, pressing Tab while the pop-up is open would move keyboard
+   focus PAST the close button and into the page behind it (the logo, the
+   Follow button) — even though the pop-up is still visually covering the
+   screen. That's disorienting for anyone navigating by keyboard.
+
+   The fix: while the pop-up is open, whenever Tab is pressed, we check
+   whether focus is about to leave the card in either direction — and if
+   so, we jump it back to the OTHER end of the card instead, so focus just
+   cycles among the elements inside the card.
+
+   `focusable` is looked up fresh every time Tab is pressed (rather than
+   once, stored ahead of time) so this keeps working correctly even if
+   more buttons/links get added inside the card later. */
+document.addEventListener("keydown", function (event) {
+  if (event.key !== "Tab") return;
+  if (!overlay.classList.contains("is-open")) return; // only trap while actually open
+
+  const focusable = card.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  if (focusable.length === 0) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    // Shift+Tab on the FIRST element would normally go backwards, out of
+    // the card — send it to the LAST element instead.
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    // Tab on the LAST element would normally go forwards, out of the card
+    // — send it back to the FIRST element instead.
+    event.preventDefault();
+    first.focus();
   }
 });
 

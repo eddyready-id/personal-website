@@ -51,7 +51,11 @@
        readers this is a pop-up dialog labelled by the "Happy Birthday"
        heading below — standard accessibility practice for any modal. -->
   <div class="birthday-overlay" id="birthday-overlay" role="dialog" aria-modal="true" aria-labelledby="birthday-heading">
-    <div class="birthday-card">
+    <!-- lang="en" here: the page's base language is Indonesian
+         (<html lang="id">), but this whole card's text is English —
+         without this, screen readers using an Indonesian voice would
+         mispronounce both the heading and the message. -->
+    <div class="birthday-card" lang="en">
       <button class="birthday-close" id="birthday-close" type="button" aria-label="Close">&times;</button>
       <h2 class="birthday-heading" id="birthday-heading">Happy Birthday</h2>
       <p class="birthday-message">You will always find your way to success, driven by your ambition and guided by your kindness. Your determination will take you far, but it is your genuine goodness that will make the journey truly meaningful.</p>
@@ -83,13 +87,10 @@
 
       <hr class="divider-line" />
 
-      <!--
-        TODO(you): this button has no real destination yet — point it at
-        wherever you want people to follow updates (Instagram, WhatsApp,
-        Telegram, an email signup form, etc.) by changing href="#" below
-        to a real URL, e.g. href="https://instagram.com/eddyready.id"
-      -->
-      <a class="btn btn-primary" href="#" id="follow-btn">
+      <!-- `target="_blank"` opens Instagram in a new tab so visitors don't
+           lose this page. `rel="noopener noreferrer"` is a security best
+           practice that always belongs alongside target="_blank". -->
+      <a class="btn btn-primary" href="https://www.instagram.com/eddy.sadeli/" id="follow-btn" target="_blank" rel="noopener noreferrer">
         <span class="btn-dot" aria-hidden="true">
           <!-- 45° arrow icon, matches the design system's Button component -->
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -97,7 +98,7 @@
             <path d="M9 7h8v8" />
           </svg>
         </span>
-        Follow untuk update terbaru!
+        Follow untuk update terbaru
       </a>
 
     </main>

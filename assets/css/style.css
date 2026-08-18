@@ -100,6 +100,7 @@ body {
   font-size: var(--fs-body-sm);
   line-height: 1.25;
   color: var(--text-primary);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .7); /* see the note on .hero below */
 }
 
 .tagline .accent { color: var(--text-accent); }
@@ -120,6 +121,19 @@ body {
   gap: var(--space-6);
   max-width: 640px;           /* keeps text lines from stretching unreadably wide on desktop */
   padding-block: var(--space-9);
+
+  /* A soft dark shadow directly behind every letter, as a contrast safety
+     net independent of exactly what photo pixel happens to sit behind the
+     text. `text-shadow` is inherited automatically, so this one line
+     covers .headline, .lede, and the pine-colored .accent spans inside
+     them too — no need to repeat it on each. Why this matters: the dark
+     overlay on <body> intentionally fades out toward the right edge on
+     wide screens (see the "PAGE BACKGROUND" comment near the top of this
+     file) so the photo stays visible there — but that also means text
+     wrapping close to that fade zone gets less overlay protection. This
+     shadow keeps it readable either way, without needing to darken the
+     whole photo more than the design calls for. */
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .65);
 }
 
 .headline {
@@ -225,7 +239,13 @@ body {
   z-index: 1;
   font-family: var(--font-body);
   font-size: var(--fs-caption);
-  color: var(--text-faint);
+  /* --text-faint was too low-contrast here (~3.7:1 against the dark
+     background — WCAG AA needs 4.5:1 for text this small). --text-muted
+     is a lighter gray that clears that bar comfortably (~6:1). */
+  color: var(--text-muted);
+  /* Extra safety net regardless of what's directly behind this text — see
+     the note on .hero above for why every text block over the photo has one. */
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .7);
 }
 
 
@@ -326,6 +346,12 @@ body {
   color: var(--text-primary);
 }
 
+/* Press feedback, matching the same shrink used on the main CTA button
+   (.btn:active above) — this button was missing that third state. */
+.birthday-close:active {
+  transform: scale(var(--press-scale));
+}
+
 
 /* ==========================================================================
    RESPONSIVE BREAKPOINTS
@@ -350,14 +376,23 @@ body {
      full screen, switch the scrim to a left-to-right fade: strong over the
      text on the left, easing away so the photo shows clearly on the right
      — matching the original mockup's composition. Still on <body>, so it
-     stays full-width no matter how wide the window gets. */
+     stays full-width no matter how wide the window gets.
+
+     The minimum (rightmost) opacity is deliberately kept fairly high —
+     .55, not the near-transparent .30 this used to be. `.page` is centered
+     on very wide monitors (see the 1200px+ breakpoint below), so the exact
+     pixel position where the text column ends keeps shifting as the window
+     gets wider — a lower floor risked the fade thinning out right behind
+     wrapped text on those screens. Combined with the text-shadow on .hero/
+     .tagline/.site-footer above, this keeps things readable without
+     needing to track that position exactly. */
   body {
     background-image:
       linear-gradient(100deg,
         rgba(11,11,11,.93) 0%,
         rgba(11,11,11,.85) 35%,
-        rgba(11,11,11,.55) 60%,
-        rgba(11,11,11,.30) 100%),
+        rgba(11,11,11,.68) 60%,
+        rgba(11,11,11,.55) 100%),
       url("../images/hero-background.jpg");
   }
 
