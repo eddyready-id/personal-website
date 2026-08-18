@@ -9,7 +9,8 @@
        of the extra space on tablets/laptops/desktops.
 
    Reading order top-to-bottom = layout order top-to-bottom on the page:
-   page shell -> header/logo -> hero text -> countdown -> button -> footer.
+   page background -> page shell -> header/logo -> hero text -> button ->
+   footer -> birthday pop-up (a fixed overlay, independent of the flow above).
 
    Every color/size/spacing value here is a `var(--token-name)` pulled from
    tokens.css — see that file if you want to know what a value actually is.
@@ -17,39 +18,49 @@
 
 
 /* --------------------------------------------------------------------------
-   PAGE SHELL
-   `.page` is the single full-height wrapper in index.html. It stacks its
-   children top to bottom and pushes the footer down even on a tall,
-   mostly-empty phone screen.
-   -------------------------------------------------------------------------- */
-.page {
-  position: relative;         /* establishes the positioning context other elements sit against */
-  min-height: 100svh;         /* "small viewport height" — full screen height, safe on mobile browser UI */
-  overflow: hidden;           /* keeps the cover-sized background photo from causing a horizontal scrollbar */
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-6) var(--space-5); /* 24px top/bottom, 20px sides on phones */
-  background-color: var(--bg-page);       /* shows briefly while the photo loads, and behind its transparent edges */
+   PAGE BACKGROUND — the full-bleed hero photo
+   Lives on <body> rather than `.page`, on purpose: `.page` gets a max-width
+   at desktop (below) so its CONTENT doesn't stretch edge-to-edge on huge
+   monitors, but we still want the PHOTO to cover the entire browser window
+   no matter how wide it is. Putting the background one level up, on <body>,
+   gives us both at once.
 
-  /* Full-bleed hero photo, with a dark gradient painted BETWEEN the photo
-     and the page content so headline/countdown text stays readable on top
-     of it. Backgrounds paint in the order listed, first-on-top — so the
-     gradient (listed first) sits visually above the photo (listed second).
-     This intentionally overrides the design system's general "no photo as
-     a full-page background" rule, specifically for this page, per request.
+   This intentionally overrides the design system's general "no photo as a
+   full-page background" rule, specifically for this page, per request. A
+   dark gradient is painted BETWEEN the photo and the page content so
+   headline/countdown text stays readable on top of it. Backgrounds paint in
+   the order listed, first-on-top — so the gradient (listed first) sits
+   visually above the photo (listed second).
 
-     On phones (this base rule) the text column runs nearly full-width, so
-     the scrim is a flat, fairly dark wash across the whole image — enough
-     contrast for white text anywhere on the page. Wider screens get a
-     left-to-right version below, matching the original mockup: dark behind
-     the text on the left, fading out so the photo reads clearly on the
-     right where there's no text over it. */
+   On phones (this base rule) the text column runs nearly full-width, so the
+   scrim is a flat, fairly dark wash across the whole image — enough
+   contrast for white text anywhere on the page. Wider screens get a
+   left-to-right version below, matching the original mockup: dark behind
+   the text on the left, fading out so the photo reads clearly on the right
+   where there's no text over it. */
+body {
+  min-height: 100svh; /* "small viewport height" — full screen height, safe on mobile browser UI */
   background-image:
     linear-gradient(rgba(11,11,11,.82), rgba(11,11,11,.82)),
     url("../images/hero-background.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+/* --------------------------------------------------------------------------
+   PAGE SHELL
+   `.page` is the layout wrapper in index.html — it stacks header/hero/
+   footer top to bottom and pushes the footer down even on a tall, mostly-
+   empty phone screen. It no longer carries the background itself (that's
+   on <body> now, see above) — it's purely a layout + max-width container.
+   -------------------------------------------------------------------------- */
+.page {
+  position: relative; /* establishes the positioning context other elements sit against */
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-5); /* 24px top/bottom, 20px sides on phones */
 }
 
 
@@ -139,65 +150,6 @@
 
 
 /* --------------------------------------------------------------------------
-   COUNTDOWN
-   -------------------------------------------------------------------------- */
-.countdown-label {
-  font-family: var(--font-body);
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-micro);
-  letter-spacing: var(--tr-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin: 0 0 var(--space-3) 0;
-}
-
-.countdown-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* four equal columns: Hari / Jam / Menit / Detik */
-  gap: var(--space-3);
-  max-width: 420px;
-}
-
-.countdown-unit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-1);
-  background: var(--bg-card);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-md);
-}
-
-.countdown-value {
-  font-family: var(--font-mono); /* JetBrains Mono — reserved for numbers/technical detail */
-  font-weight: var(--fw-medium);
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  line-height: 1;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums; /* keeps digits the same width so they don't jiggle as they tick */
-}
-
-.countdown-unit-label {
-  font-family: var(--font-body);
-  font-size: 11px;
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* Shown instead of the digit grid once the countdown reaches zero — see
-   countdown.js for the logic that toggles this. Hidden by default. */
-.countdown-done {
-  display: none;
-  font-family: var(--font-display);
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-h3);
-  color: var(--text-accent);
-}
-
-
-/* --------------------------------------------------------------------------
    DIVIDER — the short accent line above the button, like the mockup
    -------------------------------------------------------------------------- */
 .divider-line {
@@ -277,6 +229,104 @@
 }
 
 
+/* --------------------------------------------------------------------------
+   BIRTHDAY POP-UP
+   A personal surprise that pops in shortly after the page loads (see
+   assets/js/birthday.js), sitting on top of everything else. Hidden by
+   default via opacity/visibility so it can fade AND scale in smoothly —
+   the `hidden` HTML attribute can't be transitioned, so we don't use it.
+   -------------------------------------------------------------------------- */
+.birthday-overlay {
+  position: fixed;
+  inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0 — covers the whole viewport */
+  z-index: 100; /* above everything else on the page (hero content sits at z-index 1) */
+  display: grid;
+  place-items: center; /* centers the card both horizontally and vertically */
+  padding: var(--space-5);
+  background: rgba(7, 7, 7, .78);
+  backdrop-filter: blur(6px); /* softly blurs the page behind the overlay */
+
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    visibility 0s linear var(--dur-slow); /* wait until the fade finishes before fully hiding */
+}
+
+/* JS adds this class to trigger the entrance; removing it reverses it. */
+.birthday-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.birthday-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: var(--pad-card-lg);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-raised);
+  text-align: center;
+
+  /* The actual "pop": starts slightly small and transparent, then settles
+     into place. Runs on a slightly longer, custom duration (480ms) rather
+     than the standard --dur-slow token, so this one special celebratory
+     moment feels a touch more deliberate than everyday hovers/transitions. */
+  transform: scale(.85);
+  opacity: 0;
+  transition: transform 480ms var(--ease-entrance), opacity 480ms var(--ease-entrance);
+}
+
+.birthday-overlay.is-open .birthday-card {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.birthday-heading {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-h2);
+  letter-spacing: var(--tr-display);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.birthday-message {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-relaxed);
+  color: var(--text-body);
+}
+
+.birthday-close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+
+.birthday-close:hover {
+  background: var(--bg-ghost-hover);
+  color: var(--text-primary);
+}
+
+
 /* ==========================================================================
    RESPONSIVE BREAKPOINTS
    Mobile-first: base rules above already work on any screen size. These
@@ -296,13 +346,12 @@
 
 /* Tablets and small laptops */
 @media (min-width: 900px) {
-  .page {
-    padding: var(--space-9) var(--space-12);
-
-    /* Now that the text column (.hero, max-width below) no longer spans
-       the full screen, switch the scrim to a left-to-right fade: strong
-       over the text on the left, easing away so the photo shows clearly
-       on the right — matching the original mockup's composition. */
+  /* Now that the text column (.hero, max-width below) no longer spans the
+     full screen, switch the scrim to a left-to-right fade: strong over the
+     text on the left, easing away so the photo shows clearly on the right
+     — matching the original mockup's composition. Still on <body>, so it
+     stays full-width no matter how wide the window gets. */
+  body {
     background-image:
       linear-gradient(100deg,
         rgba(11,11,11,.93) 0%,
@@ -312,19 +361,23 @@
       url("../images/hero-background.jpg");
   }
 
+  .page {
+    padding: var(--space-9) var(--space-12);
+  }
+
   .hero {
     max-width: 680px;
     padding-block: var(--space-11);
   }
-
-  .countdown-value { font-size: 2.25rem; }
 }
 
 /* Desktop */
 @media (min-width: 1200px) {
   .page {
-    /* Keep content readable on very wide monitors: centre a max-width
-       column instead of letting the layout stretch edge-to-edge. */
+    /* Keep CONTENT readable on very wide monitors: centre a max-width
+       column instead of letting text stretch edge-to-edge. The background
+       photo on <body> is unaffected by this and still spans the full
+       browser width. */
     max-width: var(--page-max);
     margin-inline: auto;
     padding-block: var(--space-11);

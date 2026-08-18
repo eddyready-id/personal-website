@@ -139,6 +139,7 @@
      SHADOW
      ------------------------------------------------------------------------ */
   --shadow-card:0 12px 32px -12px rgba(0,0,0,.7);
+  --shadow-raised:0 24px 60px -20px rgba(0,0,0,.8); /* bigger, softer shadow for things that float above the page, like the birthday pop-up */
   --shadow-accent:0 14px 34px -14px rgba(0,103,79,.55); /* the green glow under the primary button */
 
 
