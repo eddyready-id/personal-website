@@ -1,0 +1,129 @@
+<!--
+  index.html — EddyReady "Coming Soon" page
+  ==========================================
+  This is the ONLY page of the site so far. It's plain HTML — no build
+  tools, no framework — so you can open this file directly in a browser
+  and it just works.
+
+  How the pieces fit together:
+    - assets/css/tokens.css  -> shared design values (colors, fonts, spacing)
+    - assets/css/style.css   -> this page's actual layout/look
+    - assets/js/countdown.js -> makes the countdown numbers tick
+    - assets/images/         -> logo, favicon, social-share image
+
+  When you're ready to build out more of the site later, new pages
+  (about.html, services.html, ...) can link the same two CSS files and
+  stay visually consistent automatically.
+-->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>EddyReady — Segera Hadir</title>
+  <meta name="description" content="Website EddyReady sedang dipersiapkan — solusi perencanaan keuangan, perlindungan, dan masa depan bersama Eddy Sadeli. Segera hadir." />
+
+  <!-- Social share preview (WhatsApp, Twitter/X, Facebook, etc.) -->
+  <meta property="og:title" content="EddyReady — Segera Hadir" />
+  <meta property="og:description" content="Dengan Eddy, selalu ready. Website EddyReady sedang dipersiapkan." />
+  <meta property="og:image" content="assets/images/og-image.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://eddyready.id/" />
+
+  <!-- Browser tab icon + "Add to Home Screen" icon -->
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png" />
+
+  <!-- Design tokens first, then page-specific styles (order matters: style.css uses tokens.css's variables) -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- ===================== HEADER: logo + tagline ===================== -->
+    <header class="site-header">
+      <a href="/" class="logo-link" aria-label="EddyReady — beranda">
+        <img class="logo" src="assets/images/eddyready-logo-white.svg" alt="EddyReady" />
+      </a>
+      <span class="header-divider" aria-hidden="true"></span>
+      <p class="tagline">Dengan Eddy, Selalu <span class="accent">Ready</span></p>
+    </header>
+
+    <!-- ===================== MAIN: headline, copy, countdown, CTA ===================== -->
+    <main class="hero">
+
+      <h1 class="headline">Coming<br />Soon</h1>
+
+      <p class="lede">
+        Website ini sedang dipersiapkan untuk memberikan informasi dan solusi
+        terbaik seputar <span class="accent">perencanaan keuangan</span>,
+        <span class="accent">perlindungan</span>, dan
+        <span class="accent">masa depan</span> Anda.
+      </p>
+
+      <!-- Countdown timer. The four numbers below are placeholders — real
+           values are filled in by assets/js/countdown.js as soon as the
+           page loads, then updated every second. -->
+      <div class="countdown">
+        <p class="countdown-label">Diluncurkan dalam</p>
+
+        <div class="countdown-grid" id="countdown-grid">
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-days">00</span>
+            <span class="countdown-unit-label">Hari</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-hours">00</span>
+            <span class="countdown-unit-label">Jam</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-minutes">00</span>
+            <span class="countdown-unit-label">Menit</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-value" id="cd-seconds">00</span>
+            <span class="countdown-unit-label">Detik</span>
+          </div>
+        </div>
+
+        <!-- Hidden until the countdown hits zero — see countdown.js -->
+        <p class="countdown-done" id="countdown-done">Sudah Ready — website telah diluncurkan.</p>
+      </div>
+
+      <hr class="divider-line" />
+
+      <!--
+        TODO(you): this button has no real destination yet — point it at
+        wherever you want people to follow updates (Instagram, WhatsApp,
+        Telegram, an email signup form, etc.) by changing href="#" below
+        to a real URL, e.g. href="https://instagram.com/eddyready.id"
+      -->
+      <a class="btn btn-primary" href="#" id="follow-btn">
+        <span class="btn-dot" aria-hidden="true">
+          <!-- 45° arrow icon, matches the design system's Button component -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7" />
+            <path d="M9 7h8v8" />
+          </svg>
+        </span>
+        Follow untuk update terbaru!
+      </a>
+
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="site-footer">
+      <p>&copy; 2026 EddyReady. Seluruh hak cipta dilindungi.</p>
+    </footer>
+
+  </div>
+
+  <!-- `defer` = run this script only after the page's HTML has finished
+       loading, so document.getElementById() calls inside it can always
+       find their elements. -->
+  <script src="assets/js/countdown.js" defer></script>
+</body>
+</html>

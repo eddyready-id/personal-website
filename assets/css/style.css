@@ -1,0 +1,332 @@
+/* ==========================================================================
+   STYLE.CSS — layout & look of the "Coming Soon" page specifically
+   ==========================================================================
+
+   This file is written MOBILE-FIRST. That means:
+     - Every rule below with NO @media wrapper is the phone-screen version.
+     - Each `@media (min-width: ...)` block further down OVERRIDES a few
+       properties once the screen is at least that wide, to make better use
+       of the extra space on tablets/laptops/desktops.
+
+   Reading order top-to-bottom = layout order top-to-bottom on the page:
+   page shell -> header/logo -> hero text -> countdown -> button -> footer.
+
+   Every color/size/spacing value here is a `var(--token-name)` pulled from
+   tokens.css — see that file if you want to know what a value actually is.
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   PAGE SHELL
+   `.page` is the single full-height wrapper in index.html. It stacks its
+   children top to bottom and pushes the footer down even on a tall,
+   mostly-empty phone screen.
+   -------------------------------------------------------------------------- */
+.page {
+  position: relative;         /* establishes the positioning context other elements sit against */
+  min-height: 100svh;         /* "small viewport height" — full screen height, safe on mobile browser UI */
+  overflow: hidden;           /* keeps the cover-sized background photo from causing a horizontal scrollbar */
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-5); /* 24px top/bottom, 20px sides on phones */
+  background-color: var(--bg-page);       /* shows briefly while the photo loads, and behind its transparent edges */
+
+  /* Full-bleed hero photo, with a dark gradient painted BETWEEN the photo
+     and the page content so headline/countdown text stays readable on top
+     of it. Backgrounds paint in the order listed, first-on-top — so the
+     gradient (listed first) sits visually above the photo (listed second).
+     This intentionally overrides the design system's general "no photo as
+     a full-page background" rule, specifically for this page, per request.
+
+     On phones (this base rule) the text column runs nearly full-width, so
+     the scrim is a flat, fairly dark wash across the whole image — enough
+     contrast for white text anywhere on the page. Wider screens get a
+     left-to-right version below, matching the original mockup: dark behind
+     the text on the left, fading out so the photo reads clearly on the
+     right where there's no text over it. */
+  background-image:
+    linear-gradient(rgba(11,11,11,.82), rgba(11,11,11,.82)),
+    url("../images/hero-background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* --------------------------------------------------------------------------
+   HEADER — logo + tagline
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: relative;
+  z-index: 1; /* sit above .hero-mark */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.logo-link {
+  display: inline-flex; /* shrinks the clickable/focusable area to fit the image exactly */
+}
+
+.logo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+/* The thin vertical line between the logo and the tagline, like the mockup.
+   `aria-hidden="true"` is set on it in the HTML since it's purely visual. */
+.header-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-strong);
+}
+
+.tagline {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-body-sm);
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.tagline .accent { color: var(--text-accent); }
+
+
+/* --------------------------------------------------------------------------
+   HERO — the big "Coming Soon" moment
+   `.hero` grows to fill the leftover vertical space and centers its content
+   in that space, so the block sits mid-page instead of glued to the header.
+   -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  z-index: 1;
+  flex: 1;                    /* take up all the room .site-header and .site-footer don't use */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-6);
+  max-width: 640px;           /* keeps text lines from stretching unreadably wide on desktop */
+  padding-block: var(--space-9);
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tr-display);
+  line-height: var(--lh-tight);
+  /* clamp(MIN, PREFERRED, MAX) = fluid font size: it scales smoothly with
+     the viewport width but never goes below/above these bounds. This is
+     what makes the huge mockup headline shrink gracefully on a small phone
+     instead of overflowing the screen. */
+  font-size: clamp(3rem, 14vw, 6.5rem);
+}
+
+.lede {
+  font-family: var(--font-body);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-body-lg);
+  line-height: var(--lh-body);
+  color: var(--text-body);
+  max-width: 46ch; /* "ch" = roughly one character width — caps the paragraph's measure for readability */
+}
+
+.lede .accent {
+  color: var(--text-accent);
+}
+
+
+/* --------------------------------------------------------------------------
+   COUNTDOWN
+   -------------------------------------------------------------------------- */
+.countdown-label {
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* four equal columns: Hari / Jam / Menit / Detik */
+  gap: var(--space-3);
+  max-width: 420px;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+}
+
+.countdown-value {
+  font-family: var(--font-mono); /* JetBrains Mono — reserved for numbers/technical detail */
+  font-weight: var(--fw-medium);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums; /* keeps digits the same width so they don't jiggle as they tick */
+}
+
+.countdown-unit-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Shown instead of the digit grid once the countdown reaches zero — see
+   countdown.js for the logic that toggles this. Hidden by default. */
+.countdown-done {
+  display: none;
+  font-family: var(--font-display);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-h3);
+  color: var(--text-accent);
+}
+
+
+/* --------------------------------------------------------------------------
+   DIVIDER — the short accent line above the button, like the mockup
+   -------------------------------------------------------------------------- */
+.divider-line {
+  width: 32px;
+  height: 2px;
+  background: var(--pine-300);
+  border: none;
+  border-radius: var(--radius-pill);
+}
+
+
+/* --------------------------------------------------------------------------
+   BUTTON — pill shape with the brand's signature "leading dot" arrow
+   -------------------------------------------------------------------------- */
+.btn {
+  align-self: flex-start;     /* don't stretch full-width on mobile — hug the text */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--pad-control-y) var(--pad-control-x);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-body-sm);
+  letter-spacing: var(--tr-label);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(var(--press-scale));
+}
+
+.btn-primary {
+  background: var(--bg-accent);
+  color: var(--text-on-accent);
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-primary:hover {
+  background: var(--bg-accent-hover);
+}
+
+.btn-dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--bg-accent);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+/* The little arrow rotates 45° on hover — a signature detail from the
+   design system's Button component. */
+.btn:hover .btn-dot {
+  transform: rotate(45deg);
+}
+
+
+/* --------------------------------------------------------------------------
+   FOOTER
+   -------------------------------------------------------------------------- */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  font-size: var(--fs-caption);
+  color: var(--text-faint);
+}
+
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   Mobile-first: base rules above already work on any screen size. These
+   just take advantage of extra space once it's available.
+   ========================================================================== */
+
+/* Small tablets and larger phones in landscape */
+@media (min-width: 640px) {
+  .page {
+    padding: var(--space-8) var(--space-9);
+  }
+
+  .logo { height: 32px; }
+
+  .hero { gap: var(--space-7); }
+}
+
+/* Tablets and small laptops */
+@media (min-width: 900px) {
+  .page {
+    padding: var(--space-9) var(--space-12);
+
+    /* Now that the text column (.hero, max-width below) no longer spans
+       the full screen, switch the scrim to a left-to-right fade: strong
+       over the text on the left, easing away so the photo shows clearly
+       on the right — matching the original mockup's composition. */
+    background-image:
+      linear-gradient(100deg,
+        rgba(11,11,11,.93) 0%,
+        rgba(11,11,11,.85) 35%,
+        rgba(11,11,11,.55) 60%,
+        rgba(11,11,11,.30) 100%),
+      url("../images/hero-background.jpg");
+  }
+
+  .hero {
+    max-width: 680px;
+    padding-block: var(--space-11);
+  }
+
+  .countdown-value { font-size: 2.25rem; }
+}
+
+/* Desktop */
+@media (min-width: 1200px) {
+  .page {
+    /* Keep content readable on very wide monitors: centre a max-width
+       column instead of letting the layout stretch edge-to-edge. */
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-block: var(--space-11);
+  }
+}

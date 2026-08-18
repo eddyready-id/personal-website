@@ -1,0 +1,10 @@
+<!-- favicon.svg: just the EddyReady mark on its own, cropped out of the full
+     logo lockup, so it stays readable at tiny sizes (browser tabs, etc).
+     Colors match "Reference/EddyReady Logo/EddyReady Green Logo.svg" exactly. -->
+<svg width="109" height="125" viewBox="0 0 109 125" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M82.684 59.3916L54.5418 75.3715L80.7425 84.3942L108.885 68.4142L82.684 59.3916Z" fill="#179565"/>
+<path d="M28.1422 40.606L0 56.5859L26.3996 65.6786L54.5418 49.6987L28.1422 40.606Z" fill="#179565"/>
+<path d="M108.884 68.4141L80.7421 84.3941L31.8373 112.165L54.442 125L108.884 94.0867V68.4141Z" fill="#016740"/>
+<path d="M98.2531 24.8772L54.5418 49.6988L26.3996 65.6788L0 80.6692V94.0867L10.7913 100.214L54.5418 75.3714L82.684 59.3915L108.885 44.5134V30.9135L98.2531 24.8772Z" fill="#016740"/>
+<path d="M54.4424 0L6.10352e-05 30.9134V56.586L28.1423 40.606L77.0488 12.8355L54.4424 0Z" fill="#016740"/>
+</svg>

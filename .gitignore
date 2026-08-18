@@ -1,0 +1,7 @@
+# macOS
+.DS_Store
+
+# Source/reference material — not part of the deployed site.
+# Kept on this machine only; the live site only needs index.html + assets/.
+/EddyReady Design System/
+/Reference/
