@@ -17,29 +17,32 @@
    - How long before it appears: change the number in `setTimeout` below
      (it's in milliseconds — 1000ms = 1 second).
    - Whether it shows every visit or only once: see the note at the bottom.
-   - Confetti: PIECE_COUNT and CONFETTI_COLORS near the top control how
-     many pieces fly and what colors they use. Turned off automatically
-     for visitors with "reduce motion" on in their OS — see
-     `prefersReducedMotion` below.
+   - Confetti: the PIECE_COUNT arguments below control how many pieces fly
+     in the pop-up's burst vs. the smaller one that drifts onto the page
+     as it closes. CONFETTI_COLORS controls what colors they use. Turned
+     off automatically for visitors with "reduce motion" on in their OS —
+     see `prefersReducedMotion` below.
    ========================================================================== */
 
 const overlay = document.getElementById("birthday-overlay");
 const closeButton = document.getElementById("birthday-close");
 const card = document.querySelector(".birthday-card");
 const confettiContainer = document.getElementById("confetti");
+const afterglowContainer = document.getElementById("confetti-afterglow");
+const followButton = document.getElementById("follow-btn");
 
 // `matchMedia` lets JS ask the browser "did this visitor turn on 'reduce
 // motion' in their OS settings?" — `.matches` is `true` if they did.
 // We check this ONCE, up front, and reuse it below rather than calling
-// matchMedia again every time the pop-up opens.
+// matchMedia again every time the pop-up opens or closes.
 const prefersReducedMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
 
-// The confetti burst only ever uses these brand colors — the same
-// "one accent (Pine), plus neutrals" rule the rest of the site follows.
-// No rainbow party colors; this is still EddyReady, just a livelier
-// moment of it.
+// Every confetti piece, in both bursts, only ever uses these brand colors
+// — the same "one accent (Pine), plus neutrals" rule the rest of the site
+// follows. No rainbow party colors; this is still EddyReady, just a
+// livelier moment of it.
 const CONFETTI_COLORS = [
   "var(--pine-300)",
   "var(--pine-400)",
@@ -48,45 +51,48 @@ const CONFETTI_COLORS = [
 ];
 
 /**
- * Creates a small burst of confetti pieces inside the pop-up card and
- * removes them again once they've finished falling. Skipped entirely
- * when `prefersReducedMotion` is true — see the note by that constant.
+ * Fills `container` with `count` confetti pieces, each flying a slightly
+ * different way, then removes each piece once it finishes falling.
+ * Shared by both the pop-up's burst and the smaller one that drifts onto
+ * the page as the pop-up closes — see spawnConfetti() and
+ * spawnAfterglow() below, which just call this with different numbers.
+ *
+ * `minDuration`/`maxDuration` (milliseconds) let the two call sites feel
+ * different: fast and busy for the pop-up's burst, slower and calmer for
+ * the afterglow, so the second one reads as the celebration settling
+ * down rather than repeating itself.
  */
-function spawnConfetti() {
-  if (prefersReducedMotion) return; // respect the visitor's OS setting — no exceptions
-
-  const PIECE_COUNT = 16;
-
-  for (let i = 0; i < PIECE_COUNT; i++) {
+function spawnConfettiPieces(container, count, minDuration, maxDuration) {
+  for (let i = 0; i < count; i++) {
     const piece = document.createElement("span");
     piece.className = "confetti-piece";
 
-    // Spread pieces across the middle of the card's width, in percent so
-    // it scales with the card instead of using fixed pixel positions.
+    // Spread pieces across the middle width, in percent so it scales with
+    // the container instead of using fixed pixel positions.
     piece.style.left = 30 + Math.random() * 40 + "%";
     piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
 
-    // These three are read by the `confetti-fall` keyframe in style.css
+    // These four are read by the `confetti-fall` keyframe in style.css
     // (as `var(--confetti-drift)` etc.) — setting them here, per piece,
     // is what makes each piece fly a slightly different way instead of
-    // all 16 moving in identical lockstep.
+    // every piece moving in identical lockstep.
     const drift = Math.round((Math.random() - 0.5) * 140); // sideways travel, -70px to 70px
     const spin = Math.round(360 + Math.random() * 360); // 1 to 2 full rotations
-    const duration = Math.round(1100 + Math.random() * 500); // 1100ms-1600ms
+    const duration = Math.round(minDuration + Math.random() * (maxDuration - minDuration));
     const delay = Math.round(Math.random() * 150); // staggered start, 0-150ms
     piece.style.setProperty("--confetti-drift", drift + "px");
     piece.style.setProperty("--confetti-spin", spin + "deg");
     piece.style.setProperty("--confetti-duration", duration + "ms");
     piece.style.setProperty("--confetti-delay", delay + "ms");
 
-    confettiContainer.appendChild(piece);
+    container.appendChild(piece);
 
     // Once a piece finishes its own fall-and-fade animation, remove it
-    // from the page. Without this, 16 new elements would pile up in the
-    // DOM every time the pop-up re-opens, and they'd sit there invisible
-    // (opacity: 0) but still technically present — harmless visually, but
-    // needless clutter. `{ once: true }` means this listener auto-removes
-    // itself after firing, so it can't ever run twice for the same piece.
+    // from the page. Without this, new elements would pile up in the DOM
+    // every time this runs, sitting there invisible (opacity: 0) but
+    // still technically present — harmless visually, but needless
+    // clutter. `{ once: true }` means this listener auto-removes itself
+    // after firing, so it can't ever run twice for the same piece.
     piece.addEventListener(
       "animationend",
       function () {
@@ -95,6 +101,27 @@ function spawnConfetti() {
       { once: true }
     );
   }
+}
+
+/**
+ * The pop-up's own burst — 16 pieces, quick and lively. Skipped entirely
+ * when `prefersReducedMotion` is true — see the note by that constant.
+ */
+function spawnConfetti() {
+  if (prefersReducedMotion) return; // respect the visitor's OS setting — no exceptions
+  spawnConfettiPieces(confettiContainer, 16, 1100, 1600);
+}
+
+/**
+ * The smaller burst that drifts onto the main page as the pop-up closes
+ * — purpose: bridge the celebration into the page instead of it just
+ * stopping. Fewer pieces (8, half the pop-up's 16) and a slower, wider
+ * duration range (1600-2400ms vs. the pop-up's 1100-1600ms) so it reads
+ * as the moment settling down, not a second identical show.
+ */
+function spawnAfterglow() {
+  if (prefersReducedMotion) return;
+  spawnConfettiPieces(afterglowContainer, 8, 1600, 2400);
 }
 
 /** Adds the "is-open" class, which triggers the CSS fade + pop-in transition. */
@@ -123,6 +150,28 @@ function openBirthdayMessage() {
 /** Removes the "is-open" class, triggering the CSS fade-out. */
 function closeBirthdayMessage() {
   overlay.classList.remove("is-open");
+  spawnAfterglow(); // a few pieces drift onto the page as the pop-up fades — see spawnAfterglow() above
+
+  // A single soft glow around the Follow button, inviting the next action
+  // right as attention returns to the page. `.invite-pulse` triggers the
+  // `invite-pulse` keyframe in style.css (on .btn::after).
+  if (!prefersReducedMotion) {
+    followButton.classList.add("invite-pulse");
+
+    // Remove the class once the animation has finished, so it can only
+    // ever play again if the pop-up is closed a second time — it never
+    // loops on its own. This CSS animation lives on the button's ::after
+    // pseudo-element, not the button itself — and pseudo-element
+    // animations don't reliably fire an `animationend` event on their
+    // host element across browsers (confirmed by testing: zero events
+    // received here even though the animation visibly plays). A plain
+    // timer matching the animation's own duration (1500ms, set in
+    // style.css) is the more portable fix — it doesn't depend on that
+    // event working everywhere.
+    window.setTimeout(function () {
+      followButton.classList.remove("invite-pulse");
+    }, 1500);
+  }
 }
 
 // Show the pop-up shortly after the page loads — a small delay (700ms) so

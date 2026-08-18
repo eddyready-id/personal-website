@@ -223,6 +223,7 @@ body {
    BUTTON — pill shape with the brand's signature "leading dot" arrow
    -------------------------------------------------------------------------- */
 .btn {
+  position: relative; /* gives .btn-invite-pulse::after (below) something to anchor to */
   align-self: flex-start;     /* don't stretch full-width on mobile — hug the text */
   display: inline-flex;
   align-items: center;
@@ -272,6 +273,36 @@ body {
    design system's Button component. */
 .btn:hover .btn-dot {
   transform: rotate(45deg);
+}
+
+/* INVITE PULSE — a single soft glow around the Follow button, right after
+   the birthday pop-up closes (see closeBirthdayMessage() in birthday.js).
+   Purpose: a gentle affordance hint back toward the one real action on
+   this page, timed to the moment attention naturally returns to it —
+   not a generic "look at me" attention-grabber that runs on its own.
+
+   Plays exactly once (JS removes the class on animationend, see
+   birthday.js) and never loops or repeats on its own. Opacity only, on a
+   separate pseudo-element behind the button — the button itself never
+   moves or resizes, so it can't feel like nagging. */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: var(--radius-pill);
+  background: radial-gradient(circle, rgba(79, 177, 152, .55) 0%, rgba(79, 177, 152, 0) 72%);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.btn.invite-pulse::after {
+  animation: invite-pulse 1500ms var(--ease-out) 1;
+}
+
+@keyframes invite-pulse {
+  0% { opacity: 0; }
+  35% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 
@@ -349,6 +380,28 @@ body {
   opacity: 1;
 }
 
+/* A soft warm wash that blooms in behind the card, arriving a beat after
+   the card itself pops in — ties the confetti + card into one warm moment
+   instead of two unrelated effects. Opacity only (no movement, no size
+   change), so it stays cheap to animate and needs no separate
+   reduced-motion override: --dur-slow already collapses to 0ms for
+   reduced-motion visitors via the token override in tokens.css, which
+   just means the glow appears instantly instead of blooming in — exactly
+   the right reduced-motion behavior (no motion, same end result). */
+.birthday-card::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(60% 60% at 50% 40%, rgba(79, 177, 152, .35) 0%, rgba(79, 177, 152, 0) 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.birthday-overlay.is-open .birthday-card::before {
+  opacity: 1;
+}
+
 .birthday-heading {
   font-family: var(--font-display);
   font-weight: var(--fw-semibold);
@@ -421,10 +474,45 @@ body {
   100% {
     /* --confetti-drift (sideways) and --confetti-spin (rotation) come from
        JS, so this keyframe is shared by every piece while each one still
-       moves uniquely. 130px of fall comfortably clears the card height. */
-    transform: translate(var(--confetti-drift, 0px), 130px) rotate(var(--confetti-spin, 360deg));
+       moves uniquely. --confetti-fall-distance defaults to 130px, which
+       comfortably clears the pop-up card's height; the afterglow pieces
+       (falling from the top of the whole viewport, not a small card)
+       override it to something larger — see the two rules above. */
+    transform: translate(var(--confetti-drift, 0px), var(--confetti-fall-distance, 130px)) rotate(var(--confetti-spin, 360deg));
     opacity: 0;
   }
+}
+
+/* --------------------------------------------------------------------------
+   AFTERGLOW — a few pieces spill onto the main page as the pop-up closes
+   ---------------------------------------------------------------------
+   Purpose: preventing a jarring change. Without this, the celebration
+   just stops the instant the dialog closes — one moment there's confetti,
+   the next it's gone. A handful of pieces continuing to drift onto the
+   page bridges that, so the mood trails off instead of cutting off.
+
+   Deliberately smaller and calmer than the pop-up's own burst (see
+   PIECE_COUNT in spawnAfterglow() in birthday.js) — this is the
+   celebration settling down, not a second show. Same rules as the main
+   burst: transform/opacity only, plays once, brand colors only, skipped
+   entirely under prefers-reduced-motion, pieces self-remove after
+   falling. Fixed positioning (not absolute) because this sits on <body>,
+   not inside a card. */
+.confetti-afterglow {
+  position: fixed;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 90; /* below the pop-up (100) in case it's still fading out, above the page content (1) */
+}
+
+.confetti-afterglow .confetti-piece {
+  top: -14px; /* starts just above the very top of the viewport, not a card */
+  --confetti-fall-distance: 340px; /* the viewport is much taller than the card — let pieces travel further */
+  /* Reuses the same confetti-fall keyframe automatically (inherited from
+     the base .confetti-piece rule) — the calmer pace comes from JS giving
+     these pieces longer --confetti-duration/--confetti-delay values, see
+     spawnAfterglow() in birthday.js. */
 }
 
 .birthday-close {

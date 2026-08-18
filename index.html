@@ -76,6 +76,13 @@
     </div>
   </div>
 
+  <!-- Empty on purpose, same as #confetti above — assets/js/birthday.js
+       fills this with a smaller burst that drifts onto the page as the
+       birthday pop-up closes, then empties it again afterward. Sits
+       outside .page (position: fixed in CSS) so it can cover the whole
+       viewport regardless of where .page itself is scrolled or sized. -->
+  <div class="confetti-afterglow" id="confetti-afterglow" aria-hidden="true"></div>
+
   <div class="page">
 
     <!-- ===================== HEADER: logo + tagline ===================== -->
