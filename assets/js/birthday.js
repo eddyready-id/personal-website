@@ -24,7 +24,23 @@ const card = document.querySelector(".birthday-card");
 /** Adds the "is-open" class, which triggers the CSS fade + pop-in transition. */
 function openBirthdayMessage() {
   overlay.classList.add("is-open");
-  closeButton.focus(); // sends keyboard focus to the close button, for accessibility
+
+  // Only move keyboard focus to the close button if the visitor hasn't
+  // already focused something else on the page. If they've been tabbing
+  // through the header or the Follow button, this pop-up appears on a
+  // 700ms timer — not because of anything THEY did — so yanking their
+  // focus away mid-action would be disorienting (worse for anyone using a
+  // screen reader, who could be mid-sentence reading something else).
+  //
+  // `document.activeElement` is "whatever element currently has keyboard
+  // focus". Right when the page loads, before anyone has pressed Tab, it
+  // defaults to `document.body` — so this check basically means "only
+  // steal focus if nobody has started navigating yet". If someone HAS
+  // already tabbed somewhere, the focus trap below still makes sure they
+  // can reach the pop-up the next time they press Tab.
+  if (document.activeElement === document.body || document.activeElement === null) {
+    closeButton.focus();
+  }
 }
 
 /** Removes the "is-open" class, triggering the CSS fade-out. */
@@ -66,9 +82,14 @@ document.addEventListener("keydown", function (event) {
    screen. That's disorienting for anyone navigating by keyboard.
 
    The fix: while the pop-up is open, whenever Tab is pressed, we check
-   whether focus is about to leave the card in either direction — and if
-   so, we jump it back to the OTHER end of the card instead, so focus just
-   cycles among the elements inside the card.
+   where focus currently is:
+     - OUTSIDE the card (this can happen now — see openBirthdayMessage
+       above — since we don't always move focus onto the pop-up when it
+       opens): send focus INTO the card instead of letting Tab do whatever
+       it would normally do next.
+     - On the FIRST or LAST focusable thing INSIDE the card: wrap around
+       to the other end, instead of leaving the card.
+   Either way, focus stays inside the pop-up for as long as it's open.
 
    `focusable` is looked up fresh every time Tab is pressed (rather than
    once, stored ahead of time) so this keeps working correctly even if
@@ -85,7 +106,14 @@ document.addEventListener("keydown", function (event) {
   const first = focusable[0];
   const last = focusable[focusable.length - 1];
 
-  if (event.shiftKey && document.activeElement === first) {
+  if (!card.contains(document.activeElement)) {
+    // Focus is somewhere outside the dialog — most likely because opening
+    // the pop-up didn't steal it (see openBirthdayMessage above). Bring it
+    // into the dialog instead of letting Tab carry on wherever the page's
+    // normal order would send it next.
+    event.preventDefault();
+    (event.shiftKey ? last : first).focus();
+  } else if (event.shiftKey && document.activeElement === first) {
     // Shift+Tab on the FIRST element would normally go backwards, out of
     // the card — send it to the LAST element instead.
     event.preventDefault();

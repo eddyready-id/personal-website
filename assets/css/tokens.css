@@ -32,10 +32,17 @@
 /* --------------------------------------------------------------------------
    FONTS
    Plus Jakarta Sans is the typeface used everywhere (headings, body, UI).
-   JetBrains Mono is used ONLY for numbers/technical detail — on this page,
-   that's the countdown digits. Both are loaded free from Google Fonts.
+   JetBrains Mono is reserved for numbers/technical detail on future pages
+   (nothing on this particular page uses it yet). Both are loaded free from
+   Google Fonts — but the actual loading now happens via <link> tags in
+   index.html's <head>, not an @import here. Why: @import inside a
+   stylesheet is "render-blocking" — the browser has to fully fetch the
+   imported font CSS before it can finish processing the rest of this file,
+   which delays the whole page's first paint. A <link rel="stylesheet">
+   in the HTML doesn't have that problem, and pairing it with
+   <link rel="preconnect"> lets the browser open the connection to
+   Google Fonts' servers earlier, in parallel with everything else.
    -------------------------------------------------------------------------- */
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500&display=swap");
 
 :root {
 

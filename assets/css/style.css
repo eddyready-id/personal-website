@@ -323,10 +323,15 @@ body {
 
 .birthday-close {
   position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
-  width: 32px;
-  height: 32px;
+  top: var(--space-3);
+  right: var(--space-3);
+  /* 44x44px is the minimum comfortable tap target for a touchscreen —
+     it was 32x32px before, which is fine for a mouse cursor but too
+     small to reliably hit with a thumb. The × glyph itself stays the
+     same visual size (font-size below is unchanged); only the invisible
+     clickable area around it grows. */
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-pill);
@@ -378,21 +383,26 @@ body {
      — matching the original mockup's composition. Still on <body>, so it
      stays full-width no matter how wide the window gets.
 
-     The minimum (rightmost) opacity is deliberately kept fairly high —
-     .55, not the near-transparent .30 this used to be. `.page` is centered
-     on very wide monitors (see the 1200px+ breakpoint below), so the exact
-     pixel position where the text column ends keeps shifting as the window
-     gets wider — a lower floor risked the fade thinning out right behind
-     wrapped text on those screens. Combined with the text-shadow on .hero/
-     .tagline/.site-footer above, this keeps things readable without
-     needing to track that position exactly. */
+     The minimum (rightmost) opacity is .78 — measured, not guessed: the
+     actual photo has a genuine near-white highlight (rgb 255,253,246,
+     sampled directly from the file) sitting in this exact region on wide
+     screens. Checked against real text colors with the WCAG contrast
+     formula, .78 is the darkest this can safely go — anything lower and
+     the pine-colored accent words in the paragraph drop below the
+     3:1 minimum for large text right where that highlight sits. `.page`
+     is centered on very wide monitors (see the 1200px+ breakpoint below),
+     so the exact pixel position where the text column ends keeps shifting
+     as the window gets wider, which is why the floor has to hold up
+     everywhere, not just at one specific width. Combined with the
+     text-shadow on .hero/.tagline/.site-footer above, this keeps things
+     readable with a real safety margin instead of a hopeful guess. */
   body {
     background-image:
       linear-gradient(100deg,
         rgba(11,11,11,.93) 0%,
-        rgba(11,11,11,.85) 35%,
-        rgba(11,11,11,.68) 60%,
-        rgba(11,11,11,.55) 100%),
+        rgba(11,11,11,.87) 35%,
+        rgba(11,11,11,.81) 60%,
+        rgba(11,11,11,.78) 100%),
       url("../images/hero-background.jpg");
   }
 

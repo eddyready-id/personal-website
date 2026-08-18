@@ -35,6 +35,15 @@
   <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
   <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png" />
 
+  <!-- Google Fonts (Plus Jakarta Sans + JetBrains Mono), loaded as <link>
+       tags instead of an @import inside tokens.css — this lets the browser
+       start fetching them immediately, in parallel with everything else,
+       instead of waiting on the stylesheet to load first.
+       preconnect = "start the network connection to this server early". -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
   <!-- Design tokens first, then page-specific styles (order matters: style.css uses tokens.css's variables) -->
   <link rel="stylesheet" href="assets/css/tokens.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
@@ -67,7 +76,12 @@
     <!-- ===================== HEADER: logo + tagline ===================== -->
     <header class="site-header">
       <a href="/" class="logo-link" aria-label="EddyReady — beranda">
-        <img class="logo" src="assets/images/eddyready-logo-white.svg" alt="EddyReady" />
+        <!-- width/height here are the SVG's real intrinsic size (381x125),
+             not the rendered size — CSS (height:28px/32px + width:auto)
+             still controls that. The browser uses this ratio to reserve
+             the right amount of space before the image loads, so the
+             page doesn't jump around (this is what "layout shift" means). -->
+        <img class="logo" src="assets/images/eddyready-logo-white.svg" alt="EddyReady" width="381" height="125" />
       </a>
       <span class="header-divider" aria-hidden="true"></span>
       <p class="tagline">Dengan Eddy, Selalu <span class="accent">Ready</span></p>
