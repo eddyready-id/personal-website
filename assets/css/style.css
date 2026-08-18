@@ -65,15 +65,51 @@ body {
 
 
 /* --------------------------------------------------------------------------
+   PAGE-ENTER MOTION
+   A one-time, top-to-bottom reveal when the page first loads: the header
+   settles in slightly before the hero content follows. This is the ONLY
+   place motion has a real ongoing presence on this page (declared dial:
+   MOTION 2 — a single staggered entrance, not a full choreographed
+   sequence). Everywhere else stays MOTION 1 (hover/press feedback only) —
+   see the birthday pop-up's confetti further down for the one deliberate
+   exception, which explains its own dial there.
+
+   Why animate at all (R-19 — motion needs a written purpose): it draws the
+   eye in the same order a person would naturally read the page (logo ->
+   headline), instead of the whole page just snapping into existence at
+   once. It runs exactly once per page load — never loops.
+
+   Reduced motion: `--dur-slow` becomes 0ms automatically under
+   `prefers-reduced-motion: reduce` (see that override up in tokens.css).
+   A 0ms keyframe animation just jumps straight to its end state, so
+   reduced-motion visitors see the finished layout immediately with no
+   perceptible movement — no separate media query needed here for that. */
+@keyframes enter-fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px); /* starts slightly below its resting spot */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
    HEADER — logo + tagline
    -------------------------------------------------------------------------- */
 .site-header {
   position: relative;
-  z-index: 1; /* sit above .hero-mark */
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
+
+  /* `both` keeps the pre-animation state (opacity: 0) applied before the
+     animation starts, and the end state after it finishes — otherwise the
+     header would flash fully visible for one frame before animating. */
+  animation: enter-fade-rise var(--dur-slow) var(--ease-out) both;
 }
 
 .logo-link {
@@ -134,6 +170,14 @@ body {
      shadow keeps it readable either way, without needing to darken the
      whole photo more than the design calls for. */
   text-shadow: 0 2px 12px rgba(0, 0, 0, .65);
+
+  /* Same entrance as .site-header (see the keyframe + explanation up
+     there), started 120ms later — small enough to read as "the same
+     moment," large enough that the eye catches the header settle first,
+     then the headline. That 120ms offset is the only thing different
+     between the two; duration and easing stay identical on purpose, so
+     it reads as one coordinated reveal, not two unrelated animations. */
+  animation: enter-fade-rise var(--dur-slow) var(--ease-out) 120ms both;
 }
 
 .headline {
@@ -319,6 +363,68 @@ body {
   font-size: var(--fs-body);
   line-height: var(--lh-relaxed);
   color: var(--text-body);
+}
+
+
+/* --------------------------------------------------------------------------
+   CONFETTI — the one deliberately loud moment on this whole page
+   ---------------------------------------------------------------------
+   Declared dial: MOTION 3 (choreographed), ENERGY 3 (bold) — a one-time,
+   intentional exception to the calm MOTION 1 the rest of the page holds
+   to (R-31: written reason for the exception). This is a personal
+   birthday surprise, not a generic UI moment, so it's allowed to be more
+   alive than a button hover — the celebration IS the point here.
+
+   What it is NOT: an "AI Powered"-style sparkle/glow effect, and not a
+   literal trumpet or party-popper icon — a decorative icon with no real
+   connection to EddyReady's brand would just be a different flavor of
+   generic AI slop. Instead, the burst is built from small rectangles in
+   the site's OWN brand colors (Pine + white) — same "no second hue" rule
+   the rest of the page follows, just with more energy behind it.
+
+   Each piece (`.confetti-piece`) is a tiny <span>, created and positioned
+   by assets/js/birthday.js right as the card pops in, then removed after
+   it finishes falling — this plays exactly ONCE per pop-up open and never
+   loops (antislop explicitly bans endless decorative motion). JS also
+   skips creating any of this entirely for visitors with
+   prefers-reduced-motion set — see birthday.js for that check; there's
+   no reduced-motion override needed here in the CSS because the pieces
+   simply never get created in the first place. */
+.confetti {
+  position: absolute;
+  inset: 0;
+  overflow: visible; /* pieces are allowed to fly outside the card's own edges */
+  pointer-events: none; /* purely decorative — never intercepts clicks/taps */
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -6px; /* starts just above the card, near where it "pops" in from */
+  /* left, background, and the two custom properties below are all set
+     per-piece from JS (--confetti-drift, --confetti-spin) so every piece
+     flies a slightly different way — see spawnConfetti() in birthday.js. */
+  width: 6px;
+  height: 14px;
+  border-radius: 1px;
+
+  /* Only transform + opacity animate here — the two properties that stay
+     cheap for the browser to animate (no layout recalculation involved),
+     per the motion performance rule this was built against. */
+  animation: confetti-fall var(--confetti-duration, 1300ms) var(--ease-out) var(--confetti-delay, 0ms) both;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    /* --confetti-drift (sideways) and --confetti-spin (rotation) come from
+       JS, so this keyframe is shared by every piece while each one still
+       moves uniquely. 130px of fall comfortably clears the card height. */
+    transform: translate(var(--confetti-drift, 0px), 130px) rotate(var(--confetti-spin, 360deg));
+    opacity: 0;
+  }
 }
 
 .birthday-close {

@@ -65,6 +65,11 @@
          without this, screen readers using an Indonesian voice would
          mispronounce both the heading and the message. -->
     <div class="birthday-card" lang="en">
+      <!-- Empty on purpose — assets/js/birthday.js fills this with a burst
+           of small confetti pieces right as the card pops in, then empties
+           it again afterward. aria-hidden: purely decorative, carries no
+           information a screen reader needs to announce. -->
+      <div class="confetti" id="confetti" aria-hidden="true"></div>
       <button class="birthday-close" id="birthday-close" type="button" aria-label="Close">&times;</button>
       <h2 class="birthday-heading" id="birthday-heading">Happy Birthday</h2>
       <p class="birthday-message">You will always find your way to success, driven by your ambition and guided by your kindness. Your determination will take you far, but it is your genuine goodness that will make the journey truly meaningful.</p>

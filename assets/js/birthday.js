@@ -6,8 +6,10 @@
    --------------------
    The pop-up markup lives in index.html (look for `id="birthday-overlay"`)
    and starts out invisible via CSS (see `.birthday-overlay` in style.css).
-   This file just adds/removes ONE class — "is-open" — at the right moments,
-   and CSS transitions handle the actual fade + "pop" animation.
+   This file adds/removes an "is-open" class at the right moments — CSS
+   transitions handle the actual fade + "pop" animation — and also builds
+   a one-time confetti burst (see spawnConfetti() below) right as the card
+   pops in.
 
    HOW TO CHANGE THINGS LATER
    ---------------------------
@@ -15,15 +17,90 @@
    - How long before it appears: change the number in `setTimeout` below
      (it's in milliseconds — 1000ms = 1 second).
    - Whether it shows every visit or only once: see the note at the bottom.
+   - Confetti: PIECE_COUNT and CONFETTI_COLORS near the top control how
+     many pieces fly and what colors they use. Turned off automatically
+     for visitors with "reduce motion" on in their OS — see
+     `prefersReducedMotion` below.
    ========================================================================== */
 
 const overlay = document.getElementById("birthday-overlay");
 const closeButton = document.getElementById("birthday-close");
 const card = document.querySelector(".birthday-card");
+const confettiContainer = document.getElementById("confetti");
+
+// `matchMedia` lets JS ask the browser "did this visitor turn on 'reduce
+// motion' in their OS settings?" — `.matches` is `true` if they did.
+// We check this ONCE, up front, and reuse it below rather than calling
+// matchMedia again every time the pop-up opens.
+const prefersReducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
+
+// The confetti burst only ever uses these brand colors — the same
+// "one accent (Pine), plus neutrals" rule the rest of the site follows.
+// No rainbow party colors; this is still EddyReady, just a livelier
+// moment of it.
+const CONFETTI_COLORS = [
+  "var(--pine-300)",
+  "var(--pine-400)",
+  "var(--pine-500)",
+  "var(--ink-000)",
+];
+
+/**
+ * Creates a small burst of confetti pieces inside the pop-up card and
+ * removes them again once they've finished falling. Skipped entirely
+ * when `prefersReducedMotion` is true — see the note by that constant.
+ */
+function spawnConfetti() {
+  if (prefersReducedMotion) return; // respect the visitor's OS setting — no exceptions
+
+  const PIECE_COUNT = 16;
+
+  for (let i = 0; i < PIECE_COUNT; i++) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+
+    // Spread pieces across the middle of the card's width, in percent so
+    // it scales with the card instead of using fixed pixel positions.
+    piece.style.left = 30 + Math.random() * 40 + "%";
+    piece.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+
+    // These three are read by the `confetti-fall` keyframe in style.css
+    // (as `var(--confetti-drift)` etc.) — setting them here, per piece,
+    // is what makes each piece fly a slightly different way instead of
+    // all 16 moving in identical lockstep.
+    const drift = Math.round((Math.random() - 0.5) * 140); // sideways travel, -70px to 70px
+    const spin = Math.round(360 + Math.random() * 360); // 1 to 2 full rotations
+    const duration = Math.round(1100 + Math.random() * 500); // 1100ms-1600ms
+    const delay = Math.round(Math.random() * 150); // staggered start, 0-150ms
+    piece.style.setProperty("--confetti-drift", drift + "px");
+    piece.style.setProperty("--confetti-spin", spin + "deg");
+    piece.style.setProperty("--confetti-duration", duration + "ms");
+    piece.style.setProperty("--confetti-delay", delay + "ms");
+
+    confettiContainer.appendChild(piece);
+
+    // Once a piece finishes its own fall-and-fade animation, remove it
+    // from the page. Without this, 16 new elements would pile up in the
+    // DOM every time the pop-up re-opens, and they'd sit there invisible
+    // (opacity: 0) but still technically present — harmless visually, but
+    // needless clutter. `{ once: true }` means this listener auto-removes
+    // itself after firing, so it can't ever run twice for the same piece.
+    piece.addEventListener(
+      "animationend",
+      function () {
+        piece.remove();
+      },
+      { once: true }
+    );
+  }
+}
 
 /** Adds the "is-open" class, which triggers the CSS fade + pop-in transition. */
 function openBirthdayMessage() {
   overlay.classList.add("is-open");
+  spawnConfetti(); // fires at the same moment the card starts popping in — the card's arrival IS what "sets it off"
 
   // Only move keyboard focus to the close button if the visitor hasn't
   // already focused something else on the page. If they've been tabbing
