@@ -1,0 +1,191 @@
+<!--
+  kata-kata/index.html — the birthday message SUBMISSION form
+  ============================================================
+  Lives at /kata-kata (Netlify serves this folder's index.html there).
+  This page does ONE thing: let someone send a birthday message (name +
+  words + an optional photo). No message wall here — that's /ucapan.
+
+  Asset paths are root-relative ("/assets/...") because this file sits in a
+  subfolder; root-relative keeps them pointing at the same shared files the
+  rest of the site uses.
+-->
+<!DOCTYPE html>
+<html lang="id" data-page="form">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tulis Ucapan — EddyReady</title>
+  <meta name="description" content="Kirim ucapan ulang tahun untuk Eddy. Tulis pesan, doa, atau kenangan favoritmu." />
+
+  <!-- Apply a saved / URL-chosen theme BEFORE the page paints, so there's
+       no flash of the wrong mode. This page has no hard default, so if the
+       visitor hasn't chosen, it follows their device (OS) setting. -->
+  <script>
+    (function () {
+      try {
+        var p = new URLSearchParams(location.search).get("theme");
+        var s = localStorage.getItem("er-theme");
+        var c = p || s;
+        if (c === "light" || c === "dark") {
+          document.documentElement.setAttribute("data-theme", c);
+        }
+        if (p) localStorage.setItem("er-theme", p);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />
+  <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
+
+  <!-- Fonts: Plus Jakarta Sans (UI) + Lora (serif, for prose/messages only) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" />
+
+  <!-- Shared brand tokens, then the warm light/dark layer, then this page. -->
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/warm.css" />
+  <link rel="stylesheet" href="/assets/css/form.css" />
+</head>
+<body>
+
+  <!-- Slim top bar: wordmark + theme toggle -->
+  <header class="topbar">
+    <a class="topbar-brand" href="/" aria-label="EddyReady — beranda">
+      <img src="/assets/images/eddyready-logo-white.svg" alt="EddyReady" width="381" height="125" class="topbar-logo" />
+    </a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Ganti mode terang / gelap"></button>
+  </header>
+
+  <main class="form-page">
+
+    <!-- The "stage" holds two panels — the form and the thank-you message —
+         and crossfades between them on successful submit. -->
+    <div class="stage" id="stage">
+
+      <!-- ============ PANEL 1: the form ============ -->
+      <section class="panel panel-form" id="panel-form" aria-labelledby="form-heading">
+        <p class="eyebrow">Ulang tahun Eddy</p>
+        <h1 class="form-heading" id="form-heading">Tulis ucapan<br />untuk Eddy</h1>
+        <p class="form-lede">
+          Bagikan doa, ucapan, atau kenangan favoritmu. Semua pesan akan
+          ditampilkan di layar saat perayaan.
+        </p>
+
+        <form class="message-form" id="message-form" novalidate>
+
+          <!-- Name -->
+          <div class="field" data-field="name">
+            <label class="field-label" for="name">Nama</label>
+            <input class="field-input" id="name" name="name" type="text"
+                   maxlength="60" autocomplete="name" required
+                   aria-describedby="name-error" />
+            <p class="field-error" id="name-error" role="alert" hidden></p>
+          </div>
+
+          <!-- Message -->
+          <div class="field" data-field="message">
+            <label class="field-label" for="message">Ucapan atau pesan</label>
+            <textarea class="field-input field-textarea" id="message" name="message"
+                      maxlength="500" rows="5" required
+                      aria-describedby="message-error message-count"></textarea>
+            <div class="field-meta">
+              <p class="field-error" id="message-error" role="alert" hidden></p>
+              <span class="char-count" id="message-count" aria-hidden="true">0 / 500</span>
+            </div>
+          </div>
+
+          <!-- Photo (optional) -->
+          <div class="field" data-field="photo">
+            <span class="field-label" id="photo-label">
+              Foto <span class="field-optional">opsional</span>
+            </span>
+
+            <!-- The real <input> is visually hidden; the dropzone <label>
+                 is what people see and tap. On a phone, tapping opens the
+                 photo picker (camera or library). -->
+            <input class="visually-hidden" id="photo" name="photo" type="file"
+                   accept="image/*" aria-describedby="photo-error" />
+
+            <label class="dropzone" id="dropzone" for="photo">
+              <span class="dropzone-icon" aria-hidden="true">
+                <!-- simple "image" glyph — a framed picture with a sun/hill -->
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.6"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="16" rx="2.5" />
+                  <circle cx="8.5" cy="9.5" r="1.6" />
+                  <path d="M3 16.5 8 12l3.5 3 3-2.5L21 17" />
+                </svg>
+              </span>
+              <span class="dropzone-text">Ketuk untuk pilih foto</span>
+              <span class="dropzone-hint">JPG atau PNG</span>
+            </label>
+
+            <!-- Preview state — revealed once a photo is chosen. -->
+            <div class="photo-preview" id="photo-preview" hidden>
+              <div class="photo-preview-frame">
+                <img class="photo-preview-img" id="photo-preview-img" alt="Pratinjau foto yang dipilih" />
+                <!-- Real upload progress overlays the preview during submit. -->
+                <div class="upload-veil" id="upload-veil" hidden>
+                  <div class="upload-ring" id="upload-ring" aria-hidden="true"></div>
+                  <span class="upload-pct" id="upload-pct">0%</span>
+                </div>
+              </div>
+              <div class="photo-preview-meta">
+                <span class="photo-name" id="photo-name"></span>
+                <button class="photo-remove" id="photo-remove" type="button">Hapus</button>
+              </div>
+            </div>
+
+            <p class="field-error" id="photo-error" role="alert" hidden></p>
+          </div>
+
+          <!-- Submit — a real state machine (idle → sending → success),
+               not just a disabled button. The label crossfades between
+               states; see form.js. -->
+          <button class="submit-btn" id="submit-btn" type="submit">
+            <span class="submit-btn-inner" id="submit-btn-inner">
+              <span class="submit-btn-dot" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.4"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17 17 7" /><path d="M9 7h8v8" />
+                </svg>
+              </span>
+              <span class="submit-btn-label" id="submit-btn-label">Kirim ucapan</span>
+            </span>
+          </button>
+
+          <!-- A place for "something went wrong" messages after submit. -->
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <!-- ============ PANEL 2: the thank-you (hidden until success) ============ -->
+      <section class="panel panel-thanks" id="panel-thanks" hidden aria-labelledby="thanks-heading">
+        <span class="thanks-mark" aria-hidden="true">
+          <!-- a hand-drawn check inside a soft ring -->
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.5 10 17.5 19.5 7" />
+          </svg>
+        </span>
+        <h2 class="thanks-heading" id="thanks-heading">Ucapanmu sudah terkirim</h2>
+        <p class="thanks-lede">
+          Terima kasih sudah ikut merayakan. Pesanmu akan muncul di layar
+          perayaan bersama ucapan yang lain.
+        </p>
+        <div class="thanks-actions">
+          <button class="text-btn" id="write-again" type="button">Tulis ucapan lain</button>
+          <a class="text-btn text-btn-quiet" href="/ucapan">Lihat semua ucapan</a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="/assets/js/form.js"></script>
+</body>
+</html>

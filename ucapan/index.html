@@ -1,0 +1,86 @@
+<!--
+  ucapan/index.html — the birthday message DISPLAY WALL
+  =====================================================
+  Lives at /ucapan. Shows every submitted message as a card, newest first,
+  and subscribes to Supabase Realtime so new submissions animate in live —
+  no refresh. Built to be projected on a screen during the event: large,
+  high-contrast, readable from across a room. Defaults to the dark forest
+  look (best on a projector); a toggle / ?theme=light still switches it.
+-->
+<!DOCTYPE html>
+<html lang="id" data-page="wall">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ucapan untuk Eddy — EddyReady</title>
+  <meta name="description" content="Dinding ucapan ulang tahun untuk Eddy — semua pesan dan doa dari teman dan keluarga." />
+
+  <!-- Apply the theme BEFORE paint. This page HARD-DEFAULTS to dark (for the
+       projector), unless a saved choice or ?theme= overrides it. -->
+  <script>
+    (function () {
+      try {
+        var p = new URLSearchParams(location.search).get("theme");
+        var s = localStorage.getItem("er-theme");
+        var c = p || s || "dark"; // ← wall defaults to dark
+        if (c === "light" || c === "dark") {
+          document.documentElement.setAttribute("data-theme", c);
+        }
+        if (p) localStorage.setItem("er-theme", p);
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />
+  <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" />
+
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/warm.css" />
+  <link rel="stylesheet" href="/assets/css/wall.css" />
+</head>
+<body>
+
+  <header class="wall-header">
+    <div class="wall-header-brand">
+      <img src="/assets/images/eddyready-logo-white.svg" alt="EddyReady" width="381" height="125" class="wall-logo" />
+      <div class="wall-titles">
+        <p class="eyebrow">Ulang tahun Eddy</p>
+        <h1 class="wall-title">Ucapan &amp; Doa</h1>
+      </div>
+    </div>
+
+    <div class="wall-header-aside">
+      <p class="wall-cta">
+        Kirim ucapanmu
+        <span class="wall-cta-url">eddyready.id/kata-kata</span>
+      </p>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Ganti mode terang / gelap"></button>
+    </div>
+  </header>
+
+  <main class="wall">
+    <!-- Cards are injected here by wall.js, newest first. -->
+    <div class="wall-grid" id="wall-grid" aria-live="polite" aria-label="Ucapan ulang tahun"></div>
+
+    <!-- Shown when there are no messages yet. -->
+    <div class="wall-empty" id="wall-empty" hidden>
+      <p class="wall-empty-title">Belum ada ucapan</p>
+      <p class="wall-empty-lede">Jadilah yang pertama mengirim ucapan di eddyready.id/kata-kata</p>
+    </div>
+
+    <!-- Shown if the Supabase keys haven't been filled in yet. -->
+    <div class="wall-notice" id="wall-notice" hidden>
+      <p class="wall-notice-title">Dinding belum terhubung ke database</p>
+      <p class="wall-notice-lede">Isi kunci Supabase di assets/js/supabase-config.js (lihat SUPABASE-SETUP.md).</p>
+    </div>
+  </main>
+
+  <script type="module" src="/assets/js/wall.js"></script>
+</body>
+</html>

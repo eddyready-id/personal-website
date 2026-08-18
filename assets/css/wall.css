@@ -1,0 +1,250 @@
+/* ==========================================================================
+   WALL.CSS — /ucapan (the projected display wall)
+   ==========================================================================
+   Dark forest canvas by default with CREAM cards (the look you chose). The
+   card face stays cream in BOTH light and dark mode — only the canvas
+   behind it flips. Sized large for projection and reading from a distance.
+
+   Colors from warm.css; spacing/radii/motion from tokens.css.
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   HEADER — event title (left) + submission prompt & theme toggle (right).
+   Sticky so the title stays visible as the wall grows.
+   -------------------------------------------------------------------------- */
+.wall-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  padding: var(--space-6) clamp(var(--space-6), 4vw, var(--space-11));
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.wall-header-brand { display: flex; align-items: center; gap: var(--space-5); }
+.wall-logo {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+/* logo is near-white art: keep as-is on the dark canvas; darken it in light mode */
+:root[data-theme="light"] .wall-logo {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(8%) saturate(900%) hue-rotate(1deg);
+}
+
+.wall-titles .eyebrow { color: var(--honey); margin: 0 0 2px; }
+.wall-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.wall-header-aside { display: flex; align-items: center; gap: var(--space-6); }
+.wall-cta {
+  text-align: right;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--ink-muted);
+  margin: 0;
+}
+.wall-cta-url {
+  display: block;
+  color: var(--accent-text);
+  font-size: 1rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   THE GRID
+   Cards are kept to similar heights (fixed photo aspect + clamped message)
+   so the grid reads tidily on a projector and so new cards can slot in with
+   a clean FLIP shift. Newest is top-left.
+   -------------------------------------------------------------------------- */
+.wall {
+  padding: clamp(var(--space-6), 3vw, var(--space-10)) clamp(var(--space-6), 4vw, var(--space-11)) var(--space-12);
+}
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: clamp(var(--space-5), 1.5vw, var(--space-7));
+  align-items: start;
+}
+
+
+/* --------------------------------------------------------------------------
+   MESSAGE CARD — always a warm cream face, warm-dark text (both modes)
+   -------------------------------------------------------------------------- */
+.msg-card {
+  background: var(--card-cream);
+  border: 1px solid var(--card-cream-line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  /* FLIP: when a new card is inserted at the top, existing cards get a
+     transient transform applied by wall.js and transition back to place.
+     This transition is what makes them glide down smoothly instead of
+     jumping. */
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+/* Photo: fixed aspect so every card with a photo is the same photo height. */
+.msg-photo {
+  aspect-ratio: 4 / 3;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.msg-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.msg-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  flex: 1;
+}
+.msg-text {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--card-cream-ink);
+  margin: 0;
+  /* clamp long messages so cards stay a sane height on the wall; the full
+     message is still in the DOM for screen readers. */
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.msg-name {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--card-cream-soft);
+  margin: 0;
+  margin-top: auto; /* pin the name to the bottom of the card */
+}
+
+/* MESSAGE-ONLY CARD (no photo) — a distinct, intentional treatment rather
+   than an empty photo box: a honey quotation flourish, larger serif text,
+   and a honey top accent bar. */
+.msg-card[data-has-photo="false"] .msg-body {
+  padding-top: var(--space-7);
+}
+.msg-card[data-has-photo="false"] .msg-text {
+  font-size: 1.3rem;
+  line-height: 1.45;
+  -webkit-line-clamp: 10;
+}
+.msg-card[data-has-photo="false"] {
+  border-top: 3px solid var(--honey);
+}
+.msg-card[data-has-photo="false"] .msg-body::before {
+  content: "\201C"; /* a left double-quote glyph, drawn in honey */
+  font-family: var(--font-serif);
+  font-size: 3.4rem;
+  line-height: 0.4;
+  color: var(--honey);
+  height: 1.4rem;
+  display: block;
+}
+
+
+/* --------------------------------------------------------------------------
+   NEW-CARD ENTRANCE
+   On load, cards stagger in. A realtime arrival gets a brief honey ring so
+   the eye catches what just landed on the live wall.
+   -------------------------------------------------------------------------- */
+.msg-card.enter-start {
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+}
+.msg-card.enter-play {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+
+/* The "just arrived" highlight — a honey ring that blooms then fades, once.
+   Uses box-shadow so it doesn't affect layout. */
+.msg-card.just-arrived {
+  animation: just-arrived 1800ms var(--ease-out) 1;
+}
+@keyframes just-arrived {
+  0%   { box-shadow: var(--shadow-soft), 0 0 0 0 var(--honey); }
+  25%  { box-shadow: var(--shadow-lift), 0 0 0 4px var(--honey); }
+  100% { box-shadow: var(--shadow-soft), 0 0 0 0 rgba(201,129,47,0); }
+}
+
+
+/* --------------------------------------------------------------------------
+   EMPTY / NOTICE STATES
+   -------------------------------------------------------------------------- */
+.wall-empty, .wall-notice {
+  max-width: 40ch;
+  margin: clamp(var(--space-10), 12vh, var(--space-14)) auto;
+  text-align: center;
+}
+.wall-empty-title, .wall-notice-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--ink);
+  margin: 0 0 var(--space-3);
+}
+.wall-empty-lede, .wall-notice-lede {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  margin: 0;
+}
+.wall-notice-title { color: var(--alert); }
+
+
+/* --------------------------------------------------------------------------
+   REDUCED MOTION — keep opacity fades (they aid comprehension of "new"),
+   drop the movement and the FLIP shift.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .msg-card { transition: none; }
+  .msg-card.enter-start { transform: none; }
+  .msg-card.enter-play { transform: none; transition: opacity var(--dur-base) var(--ease-out); }
+  .msg-card.just-arrived { animation: none; }
+}
+
+
+/* --------------------------------------------------------------------------
+   LARGER SCREENS / PROJECTION — scale type + cards up so they read from
+   across a room. On a big projected display these become large and legible.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1000px) {
+  .wall-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  .msg-text { font-size: 1.2rem; }
+  .msg-card[data-has-photo="false"] .msg-text { font-size: 1.5rem; }
+  .msg-name { font-size: 1.05rem; }
+}
+@media (min-width: 1600px) {
+  .wall-grid { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
+  .wall-title { font-size: 2.8rem; }
+  .msg-text { font-size: 1.35rem; }
+  .msg-card[data-has-photo="false"] .msg-text { font-size: 1.7rem; }
+}

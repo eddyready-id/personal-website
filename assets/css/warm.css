@@ -1,0 +1,233 @@
+/* ==========================================================================
+   WARM.CSS — the "celebration" theme layer (light + dark) for the two
+   birthday-message pages: /kata-kata (the form) and /ucapan (the wall)
+   ==========================================================================
+
+   HOW THIS FITS WITH THE REST OF THE SITE
+   ----------------------------------------
+   The coming-soon page (index.html) is dark-only and uses tokens.css +
+   style.css. Those files are left completely untouched so that page can't
+   break. These two NEW pages instead load:
+
+       tokens.css   (shared brand tokens: the Pine green scale, Plus Jakarta
+                     font, the spacing/radii/motion scales, the CSS reset)
+       warm.css     (THIS file — adds the warm cream/forest palette, the
+                     Lora serif, the honey accent, and full light+dark mode)
+       form.css / wall.css   (the individual page's own layout)
+
+   So we reuse the shared brand values (green, spacing rhythm, motion
+   curves) and add a warmer, light-capable skin on top. Nothing here
+   changes what the coming-soon page renders.
+
+   HOW LIGHT / DARK WORKS
+   -----------------------
+   Colors are named by ROLE ("--canvas", "--ink") not by value, and the
+   values flip based on mode. Three things decide the mode, in priority
+   order (highest wins):
+     1. A manual choice saved in the browser (the theme toggle button, or
+        a "?theme=light" / "?theme=dark" link — handy for the projector).
+     2. A per-page default (the wall hard-defaults to dark for projection;
+        the form has no hard default).
+     3. The visitor's OS setting (prefers-color-scheme).
+   A tiny inline script in each page's <head> applies 1 and 2 before the
+   page paints (so there's no light-to-dark "flash"); rule 3 is handled
+   here in CSS by the @media block below.
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   FONTS
+   Plus Jakarta Sans (headings + all UI) is already loaded via <link> in the
+   page <head>. Lora (a warm serif) is added there too, and is used ONLY for
+   body prose and the birthday messages themselves — never for buttons,
+   labels, or any UI chrome, per the brand rules.
+   -------------------------------------------------------------------------- */
+:root {
+  --font-serif: "Lora", Georgia, "Times New Roman", serif;
+
+  /* HONEY / AMBER — for rare emphasis only (an eyebrow flourish, the
+     "just arrived" highlight on the wall). NEVER a button color. */
+  --honey: #C9812F;
+  --honey-soft: rgba(201, 129, 47, 0.16);
+
+  /* ------------------------------------------------------------------------
+     LIGHT MODE (the base — warm cream canvas, warm near-black text)
+     "Warm" grays mean brown-tinted, never blue-tinted.
+     ------------------------------------------------------------------------ */
+  --canvas: #F6F1E7;       /* the page background — warm cream */
+  --surface: #FFFDF9;      /* raised panels, form fields — warm near-white */
+  --surface-2: #EFE8DA;    /* recessed "wells" (e.g. the empty photo dropzone) */
+
+  --ink: #2B2621;          /* primary text — warm near-black */
+  --ink-soft: #4C443C;     /* body text */
+  --ink-muted: #7C7266;    /* secondary / helper text */
+  --ink-faint: #A89D8F;    /* faintest text, placeholders */
+
+  --line: rgba(43, 38, 33, 0.12);        /* hairline borders */
+  --line-strong: rgba(43, 38, 33, 0.22); /* stronger borders */
+
+  /* Green that adapts: on a light canvas, the deep Pine reads as text; the
+     button FILL stays the same deep Pine in both modes (white text on it). */
+  --accent: var(--pine-500);        /* #00674F — button fills, focus rings */
+  --accent-press: var(--pine-600);  /* pressed button */
+  --accent-text: var(--pine-500);   /* green used as TEXT / links on light */
+
+  /* Validation: a warm terracotta, not a cold generic red — stays on-brand
+     warm while still clearly reading as "needs attention". */
+  --alert: #B4472B;
+  --alert-soft: rgba(180, 71, 43, 0.12);
+
+  /* Soft shadows, warm-tinted (not the usual cold black) */
+  --shadow-soft: 0 1px 2px rgba(43, 38, 33, 0.06), 0 8px 24px -12px rgba(43, 38, 33, 0.18);
+  --shadow-lift: 0 2px 4px rgba(43, 38, 33, 0.08), 0 20px 48px -20px rgba(43, 38, 33, 0.30);
+
+  /* ------------------------------------------------------------------------
+     THE WALL'S CARDS ARE ALWAYS CREAM (in BOTH modes)
+     The wall look you chose is "deep forest background with cream cards", so
+     these card tokens do NOT flip with light/dark — the card face stays a
+     warm cream with warm-dark text whether the canvas behind it is forest
+     (dark mode) or lighter cream (light mode). Only the canvas flips.
+     ------------------------------------------------------------------------ */
+  --card-cream: #F8F4EB;
+  --card-cream-raised: #FEFCF6;
+  --card-cream-ink: #2B2621;
+  --card-cream-soft: #4C443C;
+  --card-cream-muted: #877C6E;
+  --card-cream-line: rgba(43, 38, 33, 0.10);
+}
+
+/* DARK MODE — applied two ways so both the manual toggle AND the OS setting
+   work:
+     • :root[data-theme="dark"]         → explicit choice (toggle / URL / wall default)
+     • :root:not([data-theme]) @media   → OS is in dark mode AND no explicit choice made
+   Both blocks set the same values. */
+:root[data-theme="dark"] {
+  --canvas: #08130F;       /* deep forest, near-black with a green undertone */
+  --surface: #10201A;      /* lifted forest surface (form fields in dark) */
+  --surface-2: #0C1813;
+
+  --ink: #F4EFE4;          /* warm cream text */
+  --ink-soft: #D9D1C3;
+  --ink-muted: #9E9688;
+  --ink-faint: #6E685D;
+
+  --line: rgba(244, 239, 228, 0.12);
+  --line-strong: rgba(244, 239, 228, 0.22);
+
+  --accent-text: var(--pine-300); /* #4FB198 — lighter green reads better on dark */
+
+  --alert: #E0866A;               /* lighter warm terracotta for dark bg */
+  --alert-soft: rgba(224, 134, 106, 0.14);
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5), 0 24px 60px -20px rgba(0, 0, 0, 0.75);
+  /* (card-cream-* deliberately NOT redefined here — cream cards stay cream) */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --canvas: #08130F;
+    --surface: #10201A;
+    --surface-2: #0C1813;
+
+    --ink: #F4EFE4;
+    --ink-soft: #D9D1C3;
+    --ink-muted: #9E9688;
+    --ink-faint: #6E685D;
+
+    --line: rgba(244, 239, 228, 0.12);
+    --line-strong: rgba(244, 239, 228, 0.22);
+
+    --accent-text: var(--pine-300);
+
+    --alert: #E0866A;
+    --alert-soft: rgba(224, 134, 106, 0.14);
+
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5), 0 24px 60px -20px rgba(0, 0, 0, 0.75);
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   BASE — apply the warm canvas to the page.
+   tokens.css's reset already set body to the DARK coming-soon background;
+   because warm.css loads after it, these win for the new pages only.
+   -------------------------------------------------------------------------- */
+body {
+  background: var(--canvas);
+  color: var(--ink-soft);
+  font-family: var(--font-body); /* Plus Jakarta — from tokens.css */
+  /* Smooth the mode flip when someone toggles, but keep it quick. Only
+     color-ish properties transition; never layout. */
+  transition: background-color var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
+}
+
+/* Headings use the display font (Plus Jakarta) and warm ink by default. */
+h1, h2, h3, h4 {
+  color: var(--ink);
+  font-family: var(--font-display);
+}
+
+/* Links default to the adaptive green. */
+a { color: var(--accent-text); }
+
+
+/* --------------------------------------------------------------------------
+   THEME TOGGLE BUTTON — a small, unobtrusive control shared by both pages.
+   Two little "sun"/"moon" style dots; we swap which is shown via CSS so
+   there's no icon library and no emoji.
+   -------------------------------------------------------------------------- */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out),
+              color var(--dur-base) var(--ease-out);
+}
+.theme-toggle:active { transform: scale(var(--press-scale)); }
+
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle:hover { border-color: var(--line-strong); color: var(--ink); }
+}
+
+/* The toggle shows a filled circle (represents the OPPOSITE mode you'd switch
+   to). We draw it with a bordered ring + inner dot; the ring becomes a
+   crescent in dark mode via a small offset shadow. Purely CSS, no assets. */
+.theme-toggle::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  box-shadow: inset 0 0 0 6px transparent;
+  transition: box-shadow var(--dur-base) var(--ease-out);
+}
+:root[data-theme="dark"] .theme-toggle::before,
+:root:not([data-theme]) .theme-toggle::before {
+  /* crescent hint in dark mode */
+  box-shadow: inset -4px 0 0 0 currentColor;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .theme-toggle::before {
+    box-shadow: inset -4px 0 0 0 currentColor;
+  }
+}
+
+/* Respect reduced motion everywhere on these pages: keep color/opacity, drop
+   movement. (tokens.css already zeroes the duration variables under reduced
+   motion, so most transitions here flatten automatically. This block also
+   neutralizes any transform-based motion the page CSS may add.) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
