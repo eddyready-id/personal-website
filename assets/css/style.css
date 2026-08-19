@@ -40,8 +40,14 @@
    where there's no text over it. */
 body {
   min-height: 100svh; /* "small viewport height" — full screen height, safe on mobile browser UI */
+  /* LIGHT TREATMENT: the hero image is bright, so instead of the old dark
+     scrim we lay a soft WARM-WHITE wash over it — enough to keep the dark
+     text readable, light enough that the celebratory "21" still shows. The
+     background-color fallback is cream too, so if the image is slow to load
+     the page stays light (not dark) and the dark text never disappears. */
+  background-color: #F6F1E7;
   background-image:
-    linear-gradient(rgba(11,11,11,.82), rgba(11,11,11,.82)),
+    linear-gradient(rgba(250,247,240,.62), rgba(250,247,240,.62)),
     url("../images/hero-background.jpg");
   background-size: cover;
   background-position: center;
@@ -591,12 +597,15 @@ body {
      text-shadow on .hero/.tagline/.site-footer above, this keeps things
      readable with a real safety margin instead of a hopeful guess. */
   body {
+    /* LIGHT TREATMENT on wide screens: a left-biased warm-white wash — near
+       opaque behind the text on the left, clearing toward the right so the
+       bright "21" and crown stay vivid where there's no text over them. */
     background-image:
       linear-gradient(100deg,
-        rgba(11,11,11,.93) 0%,
-        rgba(11,11,11,.87) 35%,
-        rgba(11,11,11,.81) 60%,
-        rgba(11,11,11,.78) 100%),
+        rgba(250,247,240,.90) 0%,
+        rgba(250,247,240,.72) 34%,
+        rgba(250,247,240,.30) 58%,
+        rgba(250,247,240,0) 82%),
       url("../images/hero-background.jpg");
   }
 
@@ -621,4 +630,49 @@ body {
     margin-inline: auto;
     padding-block: var(--space-11);
   }
+}
+
+
+/* ==========================================================================
+   LIGHT TREATMENT — text + logo overrides for the bright "21" background
+   ==========================================================================
+   The rules above (and in tokens.css) were built for a DARK hero: white
+   text with dark shadows. The background is now a bright image, so this
+   block flips the text to warm-dark, drops the dark shadows, and darkens
+   the logo. Kept as one clearly-labelled block at the end so it's easy to
+   find or undo. Warm grays (brown-tinted) match the rest of the brand.
+   -------------------------------------------------------------------------- */
+
+/* Logo: the SVG art is near-white; darken it to warm ink so it reads on the
+   light background. (Same filter trick used on the form/wall pages.) */
+.logo {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(8%) saturate(900%) hue-rotate(1deg);
+}
+
+/* Tagline (top-right): warm dark, no shadow; its accent word stays green but
+   steps to the darker Pine that reads on a light background. */
+.tagline {
+  color: #2B2621;
+  text-shadow: none;
+}
+.tagline .accent { color: var(--pine-500); }
+
+/* Hero text: remove the dark shadow that existed only for the dark photo. */
+.hero { text-shadow: none; }
+
+/* Headline: warm near-black. A faint WHITE glow keeps the big letters crisp
+   if they ever overlap a busier part of the image. */
+.headline {
+  color: #241F1B;
+  text-shadow: 0 1px 10px rgba(250, 247, 240, .6);
+}
+
+/* Body paragraph: warm dark; its highlighted phrases use the darker Pine. */
+.lede { color: #4C443C; }
+.lede .accent { color: var(--pine-500); }
+
+/* Footer: warm muted, no shadow. */
+.site-footer {
+  color: #7C7266;
+  text-shadow: none;
 }
