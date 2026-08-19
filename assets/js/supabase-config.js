@@ -23,14 +23,15 @@
      key and must stay secret on a server. We only ever use the anon key.
    ========================================================================== */
 
-// ⬇️ REPLACE THESE TWO LINES with your own values.
-export const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
-export const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";
+// ⬇️ SUPABASE_URL is set. The anon key still needs to go in below.
+export const SUPABASE_URL = "https://gsgxbzcyfeniqwhhhenv.supabase.co";
+export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzZ3hiemN5ZmVuaXF3aGhoZW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNjcwNTQsImV4cCI6MjEwMjY0MzA1NH0.dgPT4KFk6wqbGJKwkN5l8BhQt2dFAeCfamN7Fat5HjQ";
 
 // The name of the Storage "bucket" your photos are uploaded into, and the
-// database table the messages go into. These match the names used in
-// SUPABASE-SETUP.md — only change them if you named yours differently.
-export const PHOTO_BUCKET = "message-photos";
+// database table the messages go into. The bucket name here must match the
+// bucket you created in the Supabase dashboard exactly (spaces and capitals
+// included). The code URL-encodes it where needed, so spaces are fine.
+export const PHOTO_BUCKET = "Birthday Eddy Sadeli";
 export const MESSAGES_TABLE = "messages";
 
 /* A tiny helper the pages use to check you've actually filled the values in

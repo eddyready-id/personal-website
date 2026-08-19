@@ -323,8 +323,11 @@ writeAgain.addEventListener("click", function () {
    ====================================================================== */
 function uploadPhotoWithProgress(blob, path, onProgress) {
   return new Promise(function (resolve, reject) {
+    // The bucket name can contain spaces/capitals ("Birthday Eddy Sadeli"),
+    // so URL-encode it for the request path (spaces become %20).
+    const bucket = encodeURIComponent(PHOTO_BUCKET);
     const endpoint =
-      SUPABASE_URL + "/storage/v1/object/" + PHOTO_BUCKET + "/" + path;
+      SUPABASE_URL + "/storage/v1/object/" + bucket + "/" + path;
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", endpoint, true);
@@ -341,9 +344,9 @@ function uploadPhotoWithProgress(blob, path, onProgress) {
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
         if (onProgress) onProgress(1);
-        // Public URL for a file in a public bucket:
+        // Public URL for a file in a public bucket (bucket name encoded):
         resolve(
-          SUPABASE_URL + "/storage/v1/object/public/" + PHOTO_BUCKET + "/" + path
+          SUPABASE_URL + "/storage/v1/object/public/" + bucket + "/" + path
         );
       } else {
         reject(new Error("Upload gagal (" + xhr.status + "): " + xhr.responseText));
