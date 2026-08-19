@@ -47,22 +47,31 @@
 <body>
 
   <header class="wall-header">
-    <div class="wall-header-brand">
+    <!-- Clicking the logo goes back to the home page. -->
+    <a class="wall-logo-link" href="/" aria-label="EddyReady — beranda">
       <img src="/assets/images/eddyready-logo-white.svg" alt="EddyReady" width="381" height="125" class="wall-logo" />
-      <div class="wall-titles">
-        <p class="eyebrow">Ulang tahun Eddy</p>
-        <h1 class="wall-title">Ucapan &amp; Doa</h1>
-      </div>
-    </div>
+    </a>
 
     <div class="wall-header-aside">
-      <p class="wall-cta">
+      <!-- "Kirim ucapanmu" is now a button to the submission page, with no
+           raw URL shown. -->
+      <a class="wall-submit-btn" href="/kata-kata">
+        <span class="wall-submit-dot" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17 17 7" /><path d="M9 7h8v8" />
+          </svg>
+        </span>
         Kirim ucapanmu
-        <span class="wall-cta-url">eddyready.id/kata-kata</span>
-      </p>
+      </a>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Ganti mode terang / gelap"></button>
     </div>
   </header>
+
+  <!-- Title block, now its own section below the header bar. -->
+  <section class="wall-intro">
+    <p class="eyebrow">Ulang tahun Eddy</p>
+    <h1 class="wall-title">Ucapan &amp; Doa</h1>
+  </section>
 
   <main class="wall">
     <!-- Cards are injected here by wall.js, newest first. -->

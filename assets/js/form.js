@@ -43,8 +43,7 @@ const previewImg = document.getElementById("photo-preview-img");
 const photoName = document.getElementById("photo-name");
 const photoRemove = document.getElementById("photo-remove");
 const uploadVeil = document.getElementById("upload-veil");
-const uploadRing = document.getElementById("upload-ring");
-const uploadPct = document.getElementById("upload-pct");
+const uploadFill = document.getElementById("upload-fill");
 const submitBtn = document.getElementById("submit-btn");
 const submitLabel = document.getElementById("submit-btn-label");
 const formError = document.getElementById("form-error");
@@ -283,8 +282,7 @@ function showUploadVeil(show) {
 }
 function setUploadProgress(fraction) {
   const pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100);
-  uploadRing.style.setProperty("--pct", String(pct));
-  uploadPct.textContent = pct + "%";
+  uploadFill.style.width = pct + "%"; // the slim bottom bar fills with real progress
 }
 
 function showSuccess() {

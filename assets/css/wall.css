@@ -27,7 +27,7 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
-.wall-header-brand { display: flex; align-items: center; gap: var(--space-5); }
+.wall-logo-link { display: inline-flex; }
 .wall-logo {
   height: 30px;
   width: auto;
@@ -38,31 +38,58 @@
   filter: brightness(0) saturate(100%) invert(13%) sepia(8%) saturate(900%) hue-rotate(1deg);
 }
 
-.wall-titles .eyebrow { color: var(--honey); margin: 0 0 2px; }
+.wall-header-aside { display: flex; align-items: center; gap: var(--space-5); }
+
+/* "Kirim ucapanmu" — a green pill button (no raw URL shown) to the form. */
+.wall-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 11px 18px 11px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-accent);
+  transition: background var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.wall-submit-btn:active { transform: scale(var(--press-scale)); }
+@media (hover: hover) and (pointer: fine) {
+  .wall-submit-btn:hover { background: var(--pine-400); }
+}
+.wall-submit-dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 24px; height: 24px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--accent);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .wall-submit-btn:hover .wall-submit-dot { transform: rotate(45deg); }
+}
+
+/* --------------------------------------------------------------------------
+   INTRO — the event title, now its own section below the header bar.
+   -------------------------------------------------------------------------- */
+.wall-intro {
+  padding: clamp(var(--space-8), 5vw, var(--space-12)) clamp(var(--space-6), 4vw, var(--space-11)) var(--space-4);
+}
+.wall-intro .eyebrow { color: var(--honey); margin: 0 0 var(--space-2); }
 .wall-title {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+  font-size: clamp(2.2rem, 6vw, 4rem);
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--ink);
   margin: 0;
-}
-
-.wall-header-aside { display: flex; align-items: center; gap: var(--space-6); }
-.wall-cta {
-  text-align: right;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.9rem;
-  line-height: 1.35;
-  color: var(--ink-muted);
-  margin: 0;
-}
-.wall-cta-url {
-  display: block;
-  color: var(--accent-text);
-  font-size: 1rem;
 }
 
 
@@ -73,7 +100,9 @@
    a clean FLIP shift. Newest is top-left.
    -------------------------------------------------------------------------- */
 .wall {
-  padding: clamp(var(--space-6), 3vw, var(--space-10)) clamp(var(--space-6), 4vw, var(--space-11)) var(--space-12);
+  /* small top padding now — the .wall-intro section above provides the
+     spacing between the title and the first row of cards */
+  padding: var(--space-4) clamp(var(--space-6), 4vw, var(--space-11)) var(--space-12);
 }
 .wall-grid {
   display: grid;

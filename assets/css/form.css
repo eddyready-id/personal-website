@@ -178,7 +178,8 @@
   resize: vertical;
   min-height: 120px;
   line-height: 1.55;
-  font-family: var(--font-serif); /* the message itself is serif prose */
+  /* Same font as the Name field (Plus Jakarta, inherited from .field-input)
+     so both fields read consistently while typing. */
 }
 
 /* Focus: label turns green, field gets a green border + soft ring. */
@@ -301,47 +302,34 @@
   display: block;
 }
 
-/* The upload veil dims the photo and shows a REAL determinate progress ring
-   (a conic-gradient arc driven by the actual bytes uploaded — see form.js
-   setting --pct). Not a generic spinner: it fills from 0 to 100%. */
+/* While uploading, the photo stays FULLY VISIBLE — we don't dim it. A slim
+   determinate bar along the bottom edge shows real progress (driven by the
+   actual bytes uploaded — see form.js setting the fill width). No dark veil,
+   no "0%": the filling green bar is the whole indicator. A soft shadow above
+   the bar keeps it legible even over a light photo. */
 .upload-veil {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  gap: var(--space-2);
-  background: rgba(8, 19, 15, 0.55);
-  backdrop-filter: blur(2px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: rgba(8, 19, 15, 0.30); /* faint track under the fill */
 }
-.upload-ring {
-  --pct: 0;
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
-  /* the arc: green up to --pct%, faint track after */
-  background: conic-gradient(
-    var(--pine-300) calc(var(--pct) * 1%),
-    rgba(255, 255, 255, 0.25) 0
-  );
-  display: grid;
-  place-items: center;
-  /* smoothly ease the arc between progress updates so it glides rather than
-     jumping in chunks as bytes arrive */
-  transition: background var(--dur-fast) linear;
-}
-.upload-ring::after {
+.upload-veil::before {
   content: "";
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: rgba(8, 19, 15, 0.85);
-}
-.upload-pct {
   position: absolute;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #fff;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  height: 28px;
+  background: linear-gradient(to top, rgba(8, 19, 15, 0.28), transparent);
+  pointer-events: none;
+}
+.upload-bar-fill {
+  height: 100%;
+  width: 0%; /* set from real upload progress in form.js */
+  background: var(--pine-300);
+  transition: width var(--dur-fast) linear;
 }
 
 .photo-preview-meta {

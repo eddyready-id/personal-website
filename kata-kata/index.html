@@ -126,10 +126,10 @@
             <div class="photo-preview" id="photo-preview" hidden>
               <div class="photo-preview-frame">
                 <img class="photo-preview-img" id="photo-preview-img" alt="Pratinjau foto yang dipilih" />
-                <!-- Real upload progress overlays the preview during submit. -->
-                <div class="upload-veil" id="upload-veil" hidden>
-                  <div class="upload-ring" id="upload-ring" aria-hidden="true"></div>
-                  <span class="upload-pct" id="upload-pct">0%</span>
+                <!-- A slim progress bar along the bottom of the still-visible
+                     photo during upload — see form.js. -->
+                <div class="upload-veil" id="upload-veil" aria-hidden="true" hidden>
+                  <div class="upload-bar-fill" id="upload-fill"></div>
                 </div>
               </div>
               <div class="photo-preview-meta">
