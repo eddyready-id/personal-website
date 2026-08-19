@@ -93,10 +93,12 @@
              still controls that. The browser uses this ratio to reserve
              the right amount of space before the image loads, so the
              page doesn't jump around (this is what "layout shift" means). -->
-        <img class="logo" src="assets/images/eddyready-logo-white.svg" alt="EddyReady" width="381" height="125" />
+        <!-- The MAIN logo (dark "EDDYREADY" text + green mark) instead of the
+             all-white one, since the background is now light. -->
+        <img class="logo" src="assets/images/eddyready-logo-main.svg" alt="EddyReady" width="385" height="125" />
       </a>
       <span class="header-divider" aria-hidden="true"></span>
-      <p class="tagline">Dengan Eddy, Selalu <span class="accent">Ready</span></p>
+      <p class="tagline">Dengan Eddy, <span class="accent">Selalu Ready</span></p>
     </header>
 
     <!-- ===================== MAIN: headline, copy, countdown, CTA ===================== -->
@@ -104,14 +106,14 @@
 
       <h1 class="headline">Coming<br />Soon</h1>
 
-      <p class="lede">
-        Website ini sedang dipersiapkan untuk memberikan informasi dan solusi
-        terbaik seputar <span class="accent">perencanaan keuangan</span>,
-        <span class="accent">perlindungan</span>, dan
-        <span class="accent">masa depan</span> Anda.
+      <!-- lang="en": this paragraph is English inside an otherwise-Indonesian
+           page, so screen readers pronounce it with an English voice. -->
+      <p class="lede" lang="en">
+        This website is being prepared to bring you the best information and
+        solutions for your <span class="accent">financial planning</span>,
+        <span class="accent">protection</span>, and
+        <span class="accent">future</span>.
       </p>
-
-      <hr class="divider-line" />
 
       <!-- `target="_blank"` opens Instagram in a new tab so visitors don't
            lose this page. `rel="noopener noreferrer"` is a security best

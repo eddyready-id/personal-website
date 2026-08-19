@@ -46,8 +46,17 @@ body {
      background-color fallback is cream too, so if the image is slow to load
      the page stays light (not dark) and the dark text never disappears. */
   background-color: #F6F1E7;
+  /* MOBILE: a top-to-bottom wash — strong behind the text up top, clearing
+     lower down so the "21" shows through in the empty space beneath the
+     content, then a little wash again at the very bottom to keep the footer
+     legible. */
   background-image:
-    linear-gradient(rgba(250,247,240,.62), rgba(250,247,240,.62)),
+    linear-gradient(180deg,
+      rgba(250,247,240,.92) 0%,
+      rgba(250,247,240,.86) 42%,
+      rgba(250,247,240,.55) 60%,
+      rgba(250,247,240,.12) 80%,
+      rgba(250,247,240,.34) 100%),
     url("../images/hero-background.jpg");
   background-size: cover;
   background-position: center;
@@ -159,7 +168,10 @@ body {
   flex: 1;                    /* take up all the room .site-header and .site-footer don't use */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* MOBILE: push the text up to the top so the lower part of the screen is
+     free for the "21" background to show through (see the clearing gradient
+     on <body> above). Desktop re-centers it in the ≥900px block below. */
+  justify-content: flex-start;
   gap: var(--space-6);
   max-width: 640px;           /* keeps text lines from stretching unreadably wide on desktop */
   padding-block: var(--space-9);
@@ -188,7 +200,7 @@ body {
 
 .headline {
   font-family: var(--font-display);
-  font-weight: var(--fw-semibold);
+  font-weight: 800; /* extra-bold — a punchier "COMING SOON" */
   text-transform: uppercase;
   letter-spacing: var(--tr-display);
   line-height: var(--lh-tight);
@@ -196,7 +208,11 @@ body {
      the viewport width but never goes below/above these bounds. This is
      what makes the huge mockup headline shrink gracefully on a small phone
      instead of overflowing the screen. */
-  font-size: clamp(3rem, 14vw, 6.5rem);
+  /* Bigger, and scaled to fill the width on a phone: "COMING" stretches
+     nearly edge-to-edge on a small screen, then caps out on desktop. 21vw
+     is tuned so the longest word fills the width without spilling past the
+     edge (which would cause a horizontal scrollbar). */
+  font-size: clamp(3.25rem, 21vw, 7rem);
 }
 
 .lede {
@@ -616,6 +632,8 @@ body {
   .hero {
     max-width: 680px;
     padding-block: var(--space-11);
+    /* Desktop re-centers the content vertically (mobile top-aligns it). */
+    justify-content: center;
   }
 }
 
@@ -646,7 +664,9 @@ body {
 /* Logo: the SVG art is near-white; darken it to warm ink so it reads on the
    light background. (Same filter trick used on the form/wall pages.) */
 .logo {
-  filter: brightness(0) saturate(100%) invert(13%) sepia(8%) saturate(900%) hue-rotate(1deg);
+  /* The MAIN logo already has dark text + a green mark made for a light
+     background, so no color filter is needed (unlike the old white logo). */
+  filter: none;
 }
 
 /* Tagline (top-right): warm dark, no shadow; its accent word stays green but
