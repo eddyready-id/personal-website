@@ -22,6 +22,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>EddyReady — Segera Hadir</title>
+  <script>
+    if (window.location.hostname && !window.location.hostname.startsWith('www.')) {
+    // Exclude local development environments
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        window.location.replace(
+            window.location.protocol + '//www.' + window.location.hostname + window.location.pathname + window.location.search + window.location.hash
+        );
+    }
+  }
+  </script>
   <meta name="description" content="Website EddyReady sedang dipersiapkan — solusi perencanaan keuangan, perlindungan, dan masa depan bersama Eddy Sadeli. Segera hadir." />
 
   <!-- Social share preview (WhatsApp, Twitter/X, Facebook, etc.) -->
@@ -140,15 +150,6 @@
        loading, so document.getElementById() calls inside it can always
        find their elements. -->
   <script src="assets/js/birthday.js" defer></script>
-  <script>if (window.location.hostname && !window.location.hostname.startsWith('www.')) {
-    // Exclude local development environments
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        window.location.replace(
-            window.location.protocol + '//www.' + window.location.hostname + window.location.pathname + window.location.search + window.location.hash
-        );
-    }
-}
-</script>
   
 </body>
 </html>
