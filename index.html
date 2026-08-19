@@ -140,5 +140,15 @@
        loading, so document.getElementById() calls inside it can always
        find their elements. -->
   <script src="assets/js/birthday.js" defer></script>
+  <script>if (window.location.hostname && !window.location.hostname.startsWith('www.')) {
+    // Exclude local development environments
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        window.location.replace(
+            window.location.protocol + '//www.' + window.location.hostname + window.location.pathname + window.location.search + window.location.hash
+        );
+    }
+}
+</script>
+  
 </body>
 </html>
