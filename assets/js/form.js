@@ -143,10 +143,28 @@ async function handleChosenPhoto(file) {
     blob = file;
   }
 
-  // Clean up any previous preview URL before making a new one.
+  const previewUrl = URL.createObjectURL(blob);
+
+  // Confirm the browser can actually DISPLAY this image before accepting it.
+  // Why: an iPhone HEIC file passes the "image/*" check above, and if
+  // downscaling failed it is used as-is — but no browser can render HEIC in
+  // an <img>. Without this check the guest sees a broken preview here, and
+  // worse, the photo uploads and shows up broken on the wall during the
+  // party. When downscaling succeeds the blob is always a canvas JPEG, so
+  // this only ever rejects genuinely undisplayable files.
+  const displayable = await canDisplay(previewUrl);
+  if (!displayable) {
+    URL.revokeObjectURL(previewUrl);
+    showFieldError(
+      "photo",
+      "Format foto ini tidak bisa ditampilkan di web (biasanya foto HEIC dari iPhone). Coba pilih foto lain, atau kirim ucapanmu tanpa foto."
+    );
+    return;
+  }
+
+  // Clean up any previous preview URL before switching to the new one.
   if (photo && photo.previewUrl) URL.revokeObjectURL(photo.previewUrl);
 
-  const previewUrl = URL.createObjectURL(blob);
   photo = { blob: blob, name: file.name, previewUrl: previewUrl };
 
   previewImg.src = previewUrl;
@@ -163,6 +181,18 @@ function clearPhoto() {
   preview.hidden = true;
   dropzone.hidden = false;
   clearFieldError("photo");
+}
+
+/* Resolves true only if the browser can actually decode and display this
+   image. Used to catch formats (notably iPhone HEIC) that pass a MIME-type
+   check but render as a broken image. */
+function canDisplay(url) {
+  return new Promise(function (resolve) {
+    const probe = new Image();
+    probe.onload = function () { resolve(probe.naturalWidth > 0); };
+    probe.onerror = function () { resolve(false); };
+    probe.src = url;
+  });
 }
 
 /* Draw the image onto a canvas at a capped size and re-export as JPEG.
