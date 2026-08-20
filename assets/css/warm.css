@@ -150,6 +150,18 @@
 
 
 /* --------------------------------------------------------------------------
+   [hidden] MUST ACTUALLY HIDE
+   The browser's built-in rule is `[hidden] { display: none }`, but that is a
+   very weak default: any element we also give `display: flex` (or grid)
+   silently overrides it, so setting `hidden` in HTML or JS stops working.
+   That is what made an empty, broken photo-preview box show up on the
+   /kata-kata form before a photo was even chosen, and left the "pick a
+   photo" dropzone on screen after one was. This makes `hidden` win.
+   -------------------------------------------------------------------------- */
+[hidden] { display: none !important; }
+
+
+/* --------------------------------------------------------------------------
    BASE — apply the warm canvas to the page.
    tokens.css's reset already set body to the DARK coming-soon background;
    because warm.css loads after it, these win for the new pages only.
