@@ -21,7 +21,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>EddyReady — Segera Hadir</title>
+  <title>EddyReady — Coming Soon</title>
   <script>
     if (window.location.hostname && !window.location.hostname.startsWith('www.')) {
     // Exclude local development environments
@@ -35,7 +35,7 @@
   <meta name="description" content="Website EddyReady sedang dipersiapkan — solusi perencanaan keuangan, perlindungan, dan masa depan bersama Eddy Sadeli. Segera hadir." />
 
   <!-- Social share preview (WhatsApp, Twitter/X, Facebook, etc.) -->
-  <meta property="og:title" content="EddyReady — Segera Hadir" />
+  <meta property="og:title" content="EddyReady — Coming Soon" />
   <meta property="og:description" content="Dengan Eddy, selalu ready. Website EddyReady sedang dipersiapkan." />
   <meta property="og:image" content="assets/images/og-image.png" />
   <meta property="og:type" content="website" />
@@ -52,11 +52,19 @@
        preconnect = "start the network connection to this server early". -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <!-- Fonts load WITHOUT blocking first paint. A plain <link rel="stylesheet">
+       to a third party is a single point of failure: if fonts.googleapis.com
+       is slow or unreachable the browser shows nothing until it gives up,
+       which looks like the page is stuck loading. The media="print" trick
+       lets the page render immediately in the fallback font and swaps the
+       webfont in when it arrives; <noscript> covers JS-disabled browsers. -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
 
   <!-- Design tokens first, then page-specific styles (order matters: style.css uses tokens.css's variables) -->
-  <link rel="stylesheet" href="assets/css/tokens.css?v=1.0.1" />
-  <link rel="stylesheet" href="assets/css/style.css?v=1.0.1" />
+  <link rel="stylesheet" href="assets/css/tokens.css?v=1.0.2" />
+  <link rel="stylesheet" href="assets/css/style.css?v=1.0.2" />
 </head>
 <body>
 
