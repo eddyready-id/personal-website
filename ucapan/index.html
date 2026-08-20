@@ -38,7 +38,15 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" />
+  <!-- Fonts load WITHOUT blocking first paint. A plain <link rel="stylesheet">
+       to a third party is a single point of failure: if fonts.googleapis.com
+       is slow or unreachable the browser shows nothing until it gives up,
+       which looks like the page is stuck loading. The media="print" trick
+       lets the page render immediately in the fallback font and swaps the
+       webfont in when it arrives; <noscript> covers JS-disabled browsers. -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,400..600;1,400..600&display=swap" /></noscript>
 
   <link rel="stylesheet" href="/assets/css/tokens.css" />
   <link rel="stylesheet" href="/assets/css/warm.css" />
