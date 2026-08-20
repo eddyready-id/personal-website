@@ -126,7 +126,7 @@ body {
 }
 
 .logo {
-  height: 28px;
+  height: 38px; /* upsized from 28px so the wordmark reads clearly on phones */
   width: auto;
   display: block;
 }
@@ -585,7 +585,7 @@ body {
     padding: var(--space-8) var(--space-9);
   }
 
-  .logo { height: 32px; }
+  .logo { height: 44px; } /* upsized from 32px */
 
   .hero { gap: var(--space-7); }
 }
