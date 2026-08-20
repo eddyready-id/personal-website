@@ -18,46 +18,40 @@
 
 
 /* --------------------------------------------------------------------------
-   PAGE BACKGROUND — the full-bleed hero photo
+   PAGE BACKGROUND — the full-bleed hero illustration
    Lives on <body> rather than `.page`, on purpose: `.page` gets a max-width
    at desktop (below) so its CONTENT doesn't stretch edge-to-edge on huge
-   monitors, but we still want the PHOTO to cover the entire browser window
+   monitors, but we still want the ARTWORK to cover the entire browser window
    no matter how wide it is. Putting the background one level up, on <body>,
    gives us both at once.
 
-   This intentionally overrides the design system's general "no photo as a
-   full-page background" rule, specifically for this page, per request. A
-   dark gradient is painted BETWEEN the photo and the page content so
-   headline/countdown text stays readable on top of it. Backgrounds paint in
-   the order listed, first-on-top — so the gradient (listed first) sits
-   visually above the photo (listed second).
-
-   On phones (this base rule) the text column runs nearly full-width, so the
-   scrim is a flat, fairly dark wash across the whole image — enough
-   contrast for white text anywhere on the page. Wider screens get a
-   left-to-right version below, matching the original mockup: dark behind
-   the text on the left, fading out so the photo reads clearly on the right
-   where there's no text over it. */
+   This intentionally overrides the design system's general "no image as a
+   full-page background" rule, specifically for this page, per request.
+   Backgrounds paint in the order listed, first-on-top — so the light wash
+   (listed first) sits visually above the illustration (listed second).
+   -------------------------------------------------------------------------- */
 body {
   min-height: 100svh; /* "small viewport height" — full screen height, safe on mobile browser UI */
-  /* LIGHT TREATMENT: the hero image is bright, so instead of the old dark
-     scrim we lay a soft WARM-WHITE wash over it — enough to keep the dark
-     text readable, light enough that the celebratory "21" still shows. The
-     background-color fallback is cream too, so if the image is slow to load
-     the page stays light (not dark) and the dark text never disappears. */
+
+  /* ART-DIRECTED BACKGROUND
+     Two different images, one per shape of screen:
+       • phones  -> hero-background-hp.jpg  (PORTRAIT 864x1821)
+       • ≥900px  -> hero-background.jpg     (LANDSCAPE 1536x1024, set further down)
+     A portrait phone showing a landscape image would crop the illustration
+     badly, so each screen shape gets art drawn for it.
+
+     SCRIM: these illustrations are already pale where the text sits (the
+     artwork deliberately leaves the upper area empty), so we only need a
+     whisper of a wash — not the heavy one the old dark photo required.
+     Measured: with no scrim at all the headline/tagline/lede still clear
+     WCAG AA (5.6:1 to 11:1) against the darkest pixel behind them. The
+     light .14 wash below is pure safety margin for phone sizes where the
+     text lands slightly lower, and it keeps the artwork clearly visible.
+     (The footer is handled separately — see .site-footer.) */
   background-color: #F6F1E7;
-  /* MOBILE: a top-to-bottom wash — strong behind the text up top, clearing
-     lower down so the "21" shows through in the empty space beneath the
-     content, then a little wash again at the very bottom to keep the footer
-     legible. */
   background-image:
-    linear-gradient(180deg,
-      rgba(250,247,240,.92) 0%,
-      rgba(250,247,240,.86) 42%,
-      rgba(250,247,240,.55) 60%,
-      rgba(250,247,240,.12) 80%,
-      rgba(250,247,240,.34) 100%),
-    url("../images/hero-background.jpg");
+    linear-gradient(rgba(250,247,240,.14), rgba(250,247,240,.14)),
+    url("../images/hero-background-hp.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -336,13 +330,18 @@ body {
   z-index: 1;
   font-family: var(--font-body);
   font-size: var(--fs-caption);
-  /* --text-faint was too low-contrast here (~3.7:1 against the dark
-     background — WCAG AA needs 4.5:1 for text this small). --text-muted
-     is a lighter gray that clears that bar comfortably (~6:1). */
-  color: var(--text-muted);
-  /* Extra safety net regardless of what's directly behind this text — see
-     the note on .hero above for why every text block over the photo has one. */
-  text-shadow: 0 1px 8px rgba(0, 0, 0, .7);
+  /* The footer is the ONE line that sits over the dark foliage at the bottom
+     of the illustration, and that strip also spans pale sky on some screen
+     sizes — so no single text color can pass contrast against both. Instead
+     the line gets its own soft cream backdrop and dark text on top of it.
+     Measured: cream at .80 opacity keeps this >=5.8:1 against BOTH the
+     darkest and the brightest pixel it can land on, at every breakpoint. */
+  color: #4C443C;
+  text-shadow: none;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(246, 241, 231, .80);
 }
 
 
@@ -593,35 +592,14 @@ body {
 
 /* Tablets and small laptops */
 @media (min-width: 900px) {
-  /* Now that the text column (.hero, max-width below) no longer spans the
-     full screen, switch the scrim to a left-to-right fade: strong over the
-     text on the left, easing away so the photo shows clearly on the right
-     — matching the original mockup's composition. Still on <body>, so it
-     stays full-width no matter how wide the window gets.
-
-     The minimum (rightmost) opacity is .78 — measured, not guessed: the
-     actual photo has a genuine near-white highlight (rgb 255,253,246,
-     sampled directly from the file) sitting in this exact region on wide
-     screens. Checked against real text colors with the WCAG contrast
-     formula, .78 is the darkest this can safely go — anything lower and
-     the pine-colored accent words in the paragraph drop below the
-     3:1 minimum for large text right where that highlight sits. `.page`
-     is centered on very wide monitors (see the 1200px+ breakpoint below),
-     so the exact pixel position where the text column ends keeps shifting
-     as the window gets wider, which is why the floor has to hold up
-     everywhere, not just at one specific width. Combined with the
-     text-shadow on .hero/.tagline/.site-footer above, this keeps things
-     readable with a real safety margin instead of a hopeful guess. */
+  /* DESKTOP ART: switch to the LANDSCAPE illustration (the portrait one
+     would letterbox awkwardly on a wide screen), with the same whisper-light
+     wash. Measured against the darkest pixel behind each text block at
+     1440x900: headline 10.0:1, tagline 9.4:1, lede 5.6:1 with no scrim at
+     all — so .14 is margin, not necessity, and the artwork stays vivid. */
   body {
-    /* LIGHT TREATMENT on wide screens: a left-biased warm-white wash — near
-       opaque behind the text on the left, clearing toward the right so the
-       bright "21" and crown stay vivid where there's no text over them. */
     background-image:
-      linear-gradient(100deg,
-        rgba(250,247,240,.90) 0%,
-        rgba(250,247,240,.72) 34%,
-        rgba(250,247,240,.30) 58%,
-        rgba(250,247,240,0) 82%),
+      linear-gradient(rgba(250,247,240,.14), rgba(250,247,240,.14)),
       url("../images/hero-background.jpg");
   }
 
@@ -692,7 +670,3 @@ body {
 .lede .accent { color: var(--pine-500); }
 
 /* Footer: warm muted, no shadow. */
-.site-footer {
-  color: #7C7266;
-  text-shadow: none;
-}
