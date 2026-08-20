@@ -95,9 +95,9 @@
 
 /* --------------------------------------------------------------------------
    THE GRID
-   Cards are kept to similar heights (fixed photo aspect + clamped message)
-   so the grid reads tidily on a projector and so new cards can slot in with
-   a clean FLIP shift. Newest is top-left.
+   Newest is top-left. Card heights now vary with message length (messages
+   are shown in full, never truncated), so `align-items: start` lets each
+   card size to its own content instead of stretching to match its row.
    -------------------------------------------------------------------------- */
 .wall {
   /* small top padding now — the .wall-intro section above provides the
@@ -156,12 +156,15 @@
   line-height: 1.5;
   color: var(--card-cream-ink);
   margin: 0;
-  /* clamp long messages so cards stay a sane height on the wall; the full
-     message is still in the DOM for screen readers. */
-  display: -webkit-box;
-  -webkit-line-clamp: 7;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  /* NO truncation. Every message shows in full.
+     This used to clamp to 7 lines to keep card heights even, but that was
+     silently cutting real guests off mid-sentence (one message was losing
+     42% of its text) on a wall whose whole purpose is to be read. Messages
+     are capped at 500 characters by the form, so there is a known upper
+     bound on how tall a card can get — roughly a dozen lines. Cards now
+     vary in height, which is the right trade for showing what people
+     actually wrote. */
+  overflow-wrap: break-word; /* stop one very long word from overflowing the card */
 }
 .msg-name {
   font-family: var(--font-body);
@@ -181,7 +184,6 @@
 .msg-card[data-has-photo="false"] .msg-text {
   font-size: 1.3rem;
   line-height: 1.45;
-  -webkit-line-clamp: 10;
 }
 .msg-card[data-has-photo="false"] {
   border-top: 3px solid var(--honey);
