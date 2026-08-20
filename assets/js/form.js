@@ -30,6 +30,7 @@ const MAX_UPLOAD_MB = 15; // reject absurdly large originals before we even resi
 const RESIZE_MAX_EDGE = 1600; // downscale so the longest side is at most this many px
 const RESIZE_QUALITY = 0.85; // JPEG quality after resize
 const UPLOAD_TIMEOUT_MS = 60000; // give up on a stalled upload after 60s
+const MAX_UNRESIZED_MB = 3; // if downscaling fails, only send the original when it is small
 
 /* ---- elements ---------------------------------------------------------- */
 const stage = document.getElementById("stage");
@@ -121,11 +122,24 @@ async function handleChosenPhoto(file) {
   }
 
   // Downscale so uploads are fast on event wifi/cellular and the wall stays
-  // light. If the browser can't do it, we fall back to the original file.
+  // light. Typical phone photos come out well under 1MB after this.
   let blob;
   try {
     blob = await resizeImage(file, RESIZE_MAX_EDGE, RESIZE_QUALITY);
   } catch (e) {
+    // Downscaling can fail on older phones. Falling back to the ORIGINAL is
+    // fine for a small file, but for a big one it means shipping the full
+    // 10MB+ image over event wifi — the slowest possible upload on the
+    // weakest possible connection, which is exactly when it will stall.
+    // Better to say so plainly and let the guest pick a smaller photo (or
+    // send their message without one).
+    if (file.size > MAX_UNRESIZED_MB * 1024 * 1024) {
+      showFieldError(
+        "photo",
+        "Foto ini terlalu besar untuk diproses di HP-mu. Coba pilih foto lain yang lebih kecil, atau kirim ucapanmu tanpa foto."
+      );
+      return;
+    }
     blob = file;
   }
 
