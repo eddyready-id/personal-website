@@ -56,6 +56,13 @@ setupThemeToggle(document.getElementById("theme-toggle"));
    URL we must revoke later to avoid leaking memory. null when no photo. */
 let photo = null; // { blob, name, previewUrl }
 
+/* True while a submission is in flight. Disabling the button covers the
+   ordinary double-tap, but it does NOT stop the form being submitted a
+   second time (e.g. pressing Enter in a field, or any programmatic submit)
+   — and a second run would create a duplicate message on the wall. This
+   flag is the actual guard. */
+let isSubmitting = false;
+
 /* ======================================================================
    CHARACTER COUNTER
    ====================================================================== */
@@ -220,6 +227,7 @@ function clearFieldError(fieldName) {
    ====================================================================== */
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
+  if (isSubmitting) return; // already sending — ignore the repeat
   formError.hidden = true;
 
   // Validate everything; focus the first problem.
@@ -281,6 +289,7 @@ form.addEventListener("submit", async function (e) {
 });
 
 function setSending(sending) {
+  isSubmitting = sending;
   submitBtn.disabled = sending;
   submitBtn.classList.toggle("is-sending", sending);
   submitLabel.textContent = sending ? "Mengirim…" : "Kirim ucapan";
