@@ -29,6 +29,7 @@ const MAX_MESSAGE = 500; // characters
 const MAX_UPLOAD_MB = 15; // reject absurdly large originals before we even resize
 const RESIZE_MAX_EDGE = 1600; // downscale so the longest side is at most this many px
 const RESIZE_QUALITY = 0.85; // JPEG quality after resize
+const UPLOAD_TIMEOUT_MS = 60000; // give up on a stalled upload after 60s
 
 /* ---- elements ---------------------------------------------------------- */
 const stage = document.getElementById("stage");
@@ -263,10 +264,19 @@ form.addEventListener("submit", async function (e) {
     console.error("Submit failed:", err);
     setSending(false);
     showUploadVeil(false);
-    showFormError(
-      "Maaf, ucapanmu gagal terkirim. Coba lagi sebentar ya. " +
-        "(" + (err && err.message ? err.message : "unknown error") + ")"
-    );
+    // Tell the guest what happened AND that nothing they typed was lost —
+    // the form is deliberately left filled in so "Kirim ucapan" just works
+    // on a second try.
+    const code = err && err.message ? err.message : "";
+    let msg;
+    if (code === "TIMEOUT") {
+      msg = "Koneksi terlalu lambat, foto gagal terkirim. Ucapanmu masih tersimpan di sini — coba tekan Kirim lagi ya.";
+    } else if (code === "NETWORK") {
+      msg = "Koneksi terputus saat mengirim. Ucapanmu masih tersimpan di sini — coba tekan Kirim lagi ya.";
+    } else {
+      msg = "Maaf, ucapanmu gagal terkirim. Ucapanmu masih tersimpan di sini — coba tekan Kirim lagi ya.";
+    }
+    showFormError(msg);
   }
 });
 
@@ -350,7 +360,16 @@ function uploadPhotoWithProgress(blob, path, onProgress) {
         reject(new Error("Upload gagal (" + xhr.status + "): " + xhr.responseText));
       }
     };
-    xhr.onerror = function () { reject(new Error("Upload gagal: masalah jaringan")); };
+    xhr.onerror = function () { reject(new Error("NETWORK")); };
+
+    // Without a timeout a stalled connection (patchy venue wifi) leaves the
+    // request open forever — the button would sit on "Mengirim…" with no
+    // error and no way to retry. This gives up after UPLOAD_TIMEOUT_MS and
+    // rejects, which lands in the submit handler's catch block: that
+    // re-enables the button and keeps everything the guest typed.
+    xhr.timeout = UPLOAD_TIMEOUT_MS;
+    xhr.ontimeout = function () { reject(new Error("TIMEOUT")); };
+
     xhr.send(blob);
   });
 }
